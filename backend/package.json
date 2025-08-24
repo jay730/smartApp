@@ -6,7 +6,11 @@
     "start": "ts-node-dev src/index.ts",
     "migrate": "ts-node ./node_modules/knex/bin/cli.js migrate:latest --knexfile knexfile.ts",
     "rollback": "ts-node ./node_modules/knex/bin/cli.js migrate:rollback --knexfile knexfile.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest src/__tests__/unit",
+    "test:integration": "jest src/__tests__/integration"
   },
   "keywords": [],
   "author": "",
@@ -23,9 +27,14 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
     "@types/multer": "^1.4.13",
     "@types/node": "^24.0.6",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.0.5",
     "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"

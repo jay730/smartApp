@@ -28,7 +28,9 @@ router.put("/:id", (req, res, next) => {
   upload.any()(req, res, async (err) => {
     if (err) return next(err);
     try {
-      req.body.files = req.files;
+      // Ensure req.body exists and attach files
+      if (!req.body) req.body = {};
+      req.body.files = req.files || [];
       await updateResidentController(req, res);
     } catch (e) {
       next(e);
@@ -44,8 +46,9 @@ router.post("/", (req, res, next) => {
   upload.any()(req, res, async (err) => {
     if (err) return next(err);
     try {
-      // Attach files to body for the service
-      req.body.files = req.files;
+      // Ensure req.body exists and attach files
+      if (!req.body) req.body = {};
+      req.body.files = req.files || [];
       await createResidentController(req, res);
     } catch (e) {
       next(e);

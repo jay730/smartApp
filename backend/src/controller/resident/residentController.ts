@@ -31,7 +31,7 @@ export const getResidentByIdController = async (
 };
 
 // ---------- Create a resident ----------
-// Instantiate VirusScanner (assumes ClamAV is running on localhost:3310)
+// Instantiate Virus Scanner (assumes ClamAV is running on localhost:3310)
 const scanner = new VirusScanner();
 
 export const createResidentController = async (req: Request, res: Response) => {
@@ -52,10 +52,11 @@ export const createResidentController = async (req: Request, res: Response) => {
         // Create a readable stream from the file buffer
         const stream = Readable.from(file.buffer);
 
-        // Scan the file
+        // Scan the file with mock virus scanner
         const result = await scanner.scanStream(stream);
 
         if (result.isInfected) {
+          console.log(`🚨 VIRUS DETECTED! File "${file.originalname}" is infected with ${result.signature}`);
           return res
             .status(400)
             .json({
@@ -63,7 +64,10 @@ export const createResidentController = async (req: Request, res: Response) => {
             });
         }
 
-        // If clean, add filename to fileRefs
+        // Log clean file
+        console.log(`✅ File "${file.originalname}" is clean - no viruses detected`);
+
+        // Add filename to fileRefs after clean scan
         fileRefs.push(file.filename);
       }
     }
@@ -95,11 +99,16 @@ export const updateResidentController = async (req: Request, res: Response) => {
         const bufferStream = Readable.from(file.buffer);
         const result: ScanResult = await scanner.scanStream(bufferStream);
         if (result.isInfected) {
+          console.log(`🚨 VIRUS DETECTED! File "${file.originalname}" is infected with ${result.signature}`);
           return res.status(400).json({
             error: `File ${file.originalname} is infected with ${result.signature}`,
           });
         }
+
+        // Log clean file
+        console.log(`✅ File "${file.originalname}" is clean - no viruses detected`);
       }
+      
 
       data.fileRefs = JSON.stringify(
         (req.files as Express.Multer.File[]).map((f) => f.filename)

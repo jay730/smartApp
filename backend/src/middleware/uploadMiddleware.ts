@@ -11,11 +11,11 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB max per file
   },
   fileFilter: (req, file, cb) => {
-    // Example: accept only images
-    if (file.mimetype.startsWith("image/")) {
+    // Accept images and text files for testing virus scanner
+    if (file.mimetype.startsWith("image/") || file.mimetype.startsWith("text/")) {
       cb(null, true);
     } else {
-      cb(new Error("Only image files are allowed"));
+      cb(new Error("Only image and text files are allowed"));
     }
   },
 });
