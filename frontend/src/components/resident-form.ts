@@ -1,240 +1,70 @@
-// Resident Form Web Component - Barebones TypeScript version
 class ResidentForm extends HTMLElement {
-    private shadow: ShadowRoot;
+  private static readonly API = "http://localhost:5000/residents";
 
-    constructor() {
-        super();
-        this.shadow = this.attachShadow({ mode: 'open' });
-    }
+  connectedCallback(): void {
+    this.innerHTML = `
+			<form id="residentForm">
+				<div>
+					<label>Name</label>
+					<input id="name" required />
+				</div>
+				<div>
+					<label>Room Number</label>
+					<input id="roomNumber" required />
+				</div>
+				<div>
+					<label>Date of Birth (YYYY-MM-DD)</label>
+					<input id="dateOfBirth" type="date" required />
+				</div>
+				<div>
+					<label>Files (optional)</label>
+					<input id="files" type="file" multiple />
+				</div>
+				<button type="submit">Add Resident</button>
+				<div id="msg" style="margin-top:8px;"></div>
+			</form>
+		`;
 
-    connectedCallback(): void {
-        this.render();
-        this.setupEventListeners();
-    }
+    const form = this.querySelector("#residentForm") as HTMLFormElement | null;
+    const msg = this.querySelector("#msg") as HTMLDivElement | null;
+    if (!form || !msg) return;
 
-    private render(): void {
-        this.shadow.innerHTML = `
-            <style>
-                .form-group {
-                    margin-bottom: 1rem;
-                }
-                .form-group label {
-                    display: block;
-                    margin-bottom: 0.5rem;
-                    font-weight: bold;
-                }
-                .form-group input, .form-group select {
-                    width: 100%;
-                    padding: 0.5rem;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                }
-                .btn {
-                    background: #007bff;
-                    color: white;
-                    border: none;
-                    padding: 0.5rem 1rem;
-                    cursor: pointer;
-                    border-radius: 4px;
-                }
-                .btn:hover {
-                    background: #0056b3;
-                }
-                .btn:disabled {
-                    opacity: 0.6;
-                    cursor: not-allowed;
-                }
-                .file-upload {
-                    border: 2px dashed #ddd;
-                    padding: 1rem;
-                    text-align: center;
-                    border-radius: 4px;
-                    margin-bottom: 1rem;
-                }
-                .file-upload.dragover {
-                    border-color: #007bff;
-                    background: #f8f9fa;
-                }
-                .file-list {
-                    margin-top: 0.5rem;
-                }
-                .file-item {
-                    background: #f8f9fa;
-                    padding: 0.5rem;
-                    margin: 0.25rem 0;
-                    border-radius: 4px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-                .remove-file {
-                    background: #dc3545;
-                    color: white;
-                    border: none;
-                    padding: 0.25rem 0.5rem;
-                    border-radius: 4px;
-                    cursor: pointer;
-                }
-                .message {
-                    padding: 1rem;
-                    border-radius: 4px;
-                    margin-bottom: 1rem;
-                }
-                .message.error {
-                    background: #f8d7da;
-                    color: #721c24;
-                }
-                .message.success {
-                    background: #d4edda;
-                    color: #155724;
-                }
-            </style>
-            
-            <form id="residentForm">
-                <div class="form-group">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="roomNumber">Room Number:</label>
-                    <input type="text" id="roomNumber" name="roomNumber" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="dateOfBirth">Date of Birth:</label>
-                    <input type="date" id="dateOfBirth" name="dateOfBirth">
-                </div>
-                
-                <div class="form-group">
-                    <label>Files:</label>
-                    <div class="file-upload" id="fileUpload">
-                        <p>Drag and drop files here or click to select</p>
-                        <input type="file" id="fileInput" multiple style="display: none;">
-                    </div>
-                    <div class="file-list" id="fileList"></div>
-                </div>
-                
-                <button type="submit" class="btn" id="submitBtn">Add Resident</button>
-            </form>
-            
-            <div id="message"></div>
-        `;
-    }
+    form.addEventListener("submit", async (e: Event) => {
+      e.preventDefault();
+      msg.textContent = "Saving...";
 
-    private setupEventListeners(): void {
-        const form = this.shadow.getElementById('residentForm') as HTMLFormElement;
-        const fileUpload = this.shadow.getElementById('fileUpload') as HTMLDivElement;
-        const fileInput = this.shadow.getElementById('fileInput') as HTMLInputElement;
-        const submitBtn = this.shadow.getElementById('submitBtn') as HTMLButtonElement;
+      const fd = new FormData();
+      fd.append(
+        "name",
+        (this.querySelector("#name") as HTMLInputElement).value.trim()
+      );
+      fd.append(
+        "roomNumber",
+        (this.querySelector("#roomNumber") as HTMLInputElement).value.trim()
+      );
+      fd.append(
+        "dateOfBirth",
+        (this.querySelector("#dateOfBirth") as HTMLInputElement).value
+      );
 
-        // File upload handling
-        fileUpload.addEventListener('click', () => fileInput.click());
-        fileUpload.addEventListener('dragover', (e: DragEvent) => {
-            e.preventDefault();
-            fileUpload.classList.add('dragover');
-        });
-        fileUpload.addEventListener('dragleave', () => {
-            fileUpload.classList.remove('dragover');
-        });
-        fileUpload.addEventListener('drop', (e: DragEvent) => {
-            e.preventDefault();
-            fileUpload.classList.remove('dragover');
-            if (e.dataTransfer?.files) {
-                this.handleFiles(e.dataTransfer.files);
-            }
-        });
-        fileInput.addEventListener('change', (e: Event) => {
-            const target = e.target as HTMLInputElement;
-            if (target.files) {
-                this.handleFiles(target.files);
-            }
-        });
+      const filesInput = this.querySelector(
+        "#files"
+      ) as HTMLInputElement | null;
+      const files = filesInput?.files ? Array.from(filesInput.files) : [];
+      files.forEach((file) => fd.append("files", file));
 
-        // Form submission
-        form.addEventListener('submit', (e: Event) => {
-            e.preventDefault();
-            this.handleSubmit();
-        });
-    }
+      const res = await fetch(ResidentForm.API, { method: "POST", body: fd });
+      if (!res.ok) {
+        msg.textContent = "Failed to add resident";
+        return;
+      }
 
-    private handleFiles(files: FileList): void {
-        const fileList = this.shadow.getElementById('fileList') as HTMLDivElement;
-        const fileArray = Array.from(files);
-        
-        fileArray.forEach(file => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item';
-            fileItem.innerHTML = `
-                <span>${file.name}</span>
-                <button type="button" class="remove-file" onclick="this.parentElement.remove()">Remove</button>
-            `;
-            fileList.appendChild(fileItem);
-        });
-    }
-
-    private async handleSubmit(): Promise<void> {
-        const submitBtn = this.shadow.getElementById('submitBtn') as HTMLButtonElement;
-        const messageDiv = this.shadow.getElementById('message') as HTMLDivElement;
-        
-        try {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Adding...';
-            
-            const formData = new FormData();
-            formData.append('name', (this.shadow.getElementById('name') as HTMLInputElement).value);
-            formData.append('roomNumber', (this.shadow.getElementById('roomNumber') as HTMLInputElement).value);
-            formData.append('dateOfBirth', (this.shadow.getElementById('dateOfBirth') as HTMLInputElement).value);
-            
-            // Add files
-            const fileItems = this.shadow.querySelectorAll('.file-item');
-            fileItems.forEach(item => {
-                const fileName = item.querySelector('span')?.textContent;
-                if (fileName) {
-                    formData.append('files', fileName);
-                }
-            });
-
-            const response = await fetch('http://localhost:5000/residents/', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to add resident');
-            }
-
-            const result = await response.json();
-            this.showMessage('Resident added successfully!', 'success');
-            this.resetForm();
-            
-            // Notify other components
-            document.dispatchEvent(new CustomEvent('residentAdded'));
-            
-        } catch (error) {
-            console.error('Error adding resident:', error);
-            this.showMessage('Failed to add resident. Please try again.', 'error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Add Resident';
-        }
-    }
-
-    private resetForm(): void {
-        (this.shadow.getElementById('residentForm') as HTMLFormElement).reset();
-        (this.shadow.getElementById('fileList') as HTMLDivElement).innerHTML = '';
-    }
-
-    private showMessage(text: string, type: 'error' | 'success'): void {
-        const messageDiv = this.shadow.getElementById('message') as HTMLDivElement;
-        messageDiv.textContent = text;
-        messageDiv.className = `message ${type}`;
-        
-        setTimeout(() => {
-            messageDiv.textContent = '';
-            messageDiv.className = 'message';
-        }, 3000);
-    }
+      msg.textContent = "Resident added";
+      form.reset();
+      document.dispatchEvent(new CustomEvent("residentAdded"));
+      setTimeout(() => (msg.textContent = ""), 1200);
+    });
+  }
 }
 
-customElements.define('resident-form', ResidentForm);
+customElements.define("resident-form", ResidentForm);

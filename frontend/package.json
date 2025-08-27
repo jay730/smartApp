@@ -11,5 +11,5 @@
     "typescript": "^5.9.2",
     "http-server": "^14.1.1"
   },
-  "description": "Barebones frontend with native TypeScript web components only"
+  "description": "Frontend with native TypeScript web components only"
 }
