@@ -56,16 +56,18 @@ export const createResidentController = async (req: Request, res: Response) => {
         const result = await scanner.scanStream(stream);
 
         if (result.isInfected) {
-          console.log(`🚨 VIRUS DETECTED! File "${file.originalname}" is infected with ${result.signature}`);
-          return res
-            .status(400)
-            .json({
-              error: `File "${file.originalname}" is infected with ${result.signature}`,
-            });
+          console.log(
+            ` VIRUS DETECTED! File "${file.originalname}" is infected with ${result.signature}`
+          );
+          return res.status(400).json({
+            error: `File "${file.originalname}" is infected with ${result.signature}`,
+          });
         }
 
         // Log clean file
-        console.log(`✅ File "${file.originalname}" is clean - no viruses detected`);
+        console.log(
+          ` File "${file.originalname}" is clean - no viruses detected`
+        );
 
         // Add filename to fileRefs after clean scan
         fileRefs.push(file.filename);
@@ -99,16 +101,19 @@ export const updateResidentController = async (req: Request, res: Response) => {
         const bufferStream = Readable.from(file.buffer);
         const result: ScanResult = await scanner.scanStream(bufferStream);
         if (result.isInfected) {
-          console.log(`🚨 VIRUS DETECTED! File "${file.originalname}" is infected with ${result.signature}`);
+          console.log(
+            ` VIRUS DETECTED! File "${file.originalname}" is infected with ${result.signature}`
+          );
           return res.status(400).json({
             error: `File ${file.originalname} is infected with ${result.signature}`,
           });
         }
 
         // Log clean file
-        console.log(`✅ File "${file.originalname}" is clean - no viruses detected`);
+        console.log(
+          ` File "${file.originalname}" is clean - no viruses detected`
+        );
       }
-      
 
       data.fileRefs = JSON.stringify(
         (req.files as Express.Multer.File[]).map((f) => f.filename)
