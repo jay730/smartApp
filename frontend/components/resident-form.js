@@ -1,19 +1,17 @@
-// Resident Form Web Component - Barebones TypeScript version
+// Resident Form Web Component - Barebones version
 class ResidentForm extends HTMLElement {
-    private shadow: ShadowRoot;
-
     constructor() {
         super();
-        this.shadow = this.attachShadow({ mode: 'open' });
+        this.attachShadow({ mode: 'open' });
     }
 
-    connectedCallback(): void {
+    connectedCallback() {
         this.render();
         this.setupEventListeners();
     }
 
-    private render(): void {
-        this.shadow.innerHTML = `
+    render() {
+        this.shadowRoot.innerHTML = `
             <style>
                 .form-group {
                     margin-bottom: 1rem;
@@ -122,44 +120,39 @@ class ResidentForm extends HTMLElement {
         `;
     }
 
-    private setupEventListeners(): void {
-        const form = this.shadow.getElementById('residentForm') as HTMLFormElement;
-        const fileUpload = this.shadow.getElementById('fileUpload') as HTMLDivElement;
-        const fileInput = this.shadow.getElementById('fileInput') as HTMLInputElement;
-        const submitBtn = this.shadow.getElementById('submitBtn') as HTMLButtonElement;
+    setupEventListeners() {
+        const form = this.shadowRoot.getElementById('residentForm');
+        const fileUpload = this.shadowRoot.getElementById('fileUpload');
+        const fileInput = this.shadowRoot.getElementById('fileInput');
+        const submitBtn = this.shadowRoot.getElementById('submitBtn');
 
         // File upload handling
         fileUpload.addEventListener('click', () => fileInput.click());
-        fileUpload.addEventListener('dragover', (e: DragEvent) => {
+        fileUpload.addEventListener('dragover', (e) => {
             e.preventDefault();
             fileUpload.classList.add('dragover');
         });
         fileUpload.addEventListener('dragleave', () => {
             fileUpload.classList.remove('dragover');
         });
-        fileUpload.addEventListener('drop', (e: DragEvent) => {
+        fileUpload.addEventListener('drop', (e) => {
             e.preventDefault();
             fileUpload.classList.remove('dragover');
-            if (e.dataTransfer?.files) {
-                this.handleFiles(e.dataTransfer.files);
-            }
+            this.handleFiles(e.dataTransfer.files);
         });
-        fileInput.addEventListener('change', (e: Event) => {
-            const target = e.target as HTMLInputElement;
-            if (target.files) {
-                this.handleFiles(target.files);
-            }
+        fileInput.addEventListener('change', (e) => {
+            this.handleFiles(e.target.files);
         });
 
         // Form submission
-        form.addEventListener('submit', (e: Event) => {
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleSubmit();
         });
     }
 
-    private handleFiles(files: FileList): void {
-        const fileList = this.shadow.getElementById('fileList') as HTMLDivElement;
+    handleFiles(files) {
+        const fileList = this.shadowRoot.getElementById('fileList');
         const fileArray = Array.from(files);
         
         fileArray.forEach(file => {
@@ -173,26 +166,26 @@ class ResidentForm extends HTMLElement {
         });
     }
 
-    private async handleSubmit(): Promise<void> {
-        const submitBtn = this.shadow.getElementById('submitBtn') as HTMLButtonElement;
-        const messageDiv = this.shadow.getElementById('message') as HTMLDivElement;
+    async handleSubmit() {
+        const submitBtn = this.shadowRoot.getElementById('submitBtn');
+        const messageDiv = this.shadowRoot.getElementById('message');
         
         try {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Adding...';
             
             const formData = new FormData();
-            formData.append('name', (this.shadow.getElementById('name') as HTMLInputElement).value);
-            formData.append('roomNumber', (this.shadow.getElementById('roomNumber') as HTMLInputElement).value);
-            formData.append('dateOfBirth', (this.shadow.getElementById('dateOfBirth') as HTMLInputElement).value);
+            formData.append('name', this.shadowRoot.getElementById('name').value);
+            formData.append('roomNumber', this.shadowRoot.getElementById('roomNumber').value);
+            formData.append('dateOfBirth', this.shadowRoot.getElementById('dateOfBirth').value);
             
             // Add files
-            const fileItems = this.shadow.querySelectorAll('.file-item');
+            const fileItems = this.shadowRoot.querySelectorAll('.file-item');
             fileItems.forEach(item => {
-                const fileName = item.querySelector('span')?.textContent;
-                if (fileName) {
-                    formData.append('files', fileName);
-                }
+                const fileName = item.querySelector('span').textContent;
+                // In a real app, you'd get the actual file object
+                // For now, we'll just send the filename
+                formData.append('files', fileName);
             });
 
             const response = await fetch('http://localhost:5000/residents/', {
@@ -220,13 +213,13 @@ class ResidentForm extends HTMLElement {
         }
     }
 
-    private resetForm(): void {
-        (this.shadow.getElementById('residentForm') as HTMLFormElement).reset();
-        (this.shadow.getElementById('fileList') as HTMLDivElement).innerHTML = '';
+    resetForm() {
+        this.shadowRoot.getElementById('residentForm').reset();
+        this.shadowRoot.getElementById('fileList').innerHTML = '';
     }
 
-    private showMessage(text: string, type: 'error' | 'success'): void {
-        const messageDiv = this.shadow.getElementById('message') as HTMLDivElement;
+    showMessage(text, type) {
+        const messageDiv = this.shadowRoot.getElementById('message');
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
         

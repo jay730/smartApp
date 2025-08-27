@@ -1,31 +1,19 @@
-// Resident List Web Component - Barebones TypeScript version
-interface Resident {
-    id: number;
-    name: string;
-    roomNumber: string;
-    dateOfBirth?: string;
-    fileRefs: string[];
-    createdAt?: string;
-    updatedAt?: string;
-}
-
+// Resident List Web Component - Barebones version
 class ResidentList extends HTMLElement {
-    private shadow: ShadowRoot;
-    private residents: Resident[] = [];
-
     constructor() {
         super();
-        this.shadow = this.attachShadow({ mode: 'open' });
+        this.attachShadow({ mode: 'open' });
+        this.residents = [];
     }
 
-    connectedCallback(): void {
+    connectedCallback() {
         this.render();
         this.setupEventListeners();
         this.loadResidents();
     }
 
-    private render(): void {
-        this.shadow.innerHTML = `
+    render() {
+        this.shadowRoot.innerHTML = `
             <style>
                 .list-header {
                     display: flex;
@@ -162,8 +150,8 @@ class ResidentList extends HTMLElement {
         `;
     }
 
-    private setupEventListeners(): void {
-        const refreshBtn = this.shadow.getElementById('refreshBtn') as HTMLButtonElement;
+    setupEventListeners() {
+        const refreshBtn = this.shadowRoot.getElementById('refreshBtn');
         
         refreshBtn.addEventListener('click', () => {
             this.loadResidents();
@@ -175,12 +163,12 @@ class ResidentList extends HTMLElement {
         });
     }
 
-    private async loadResidents(): Promise<void> {
-        const loadingDiv = this.shadow.getElementById('loading') as HTMLDivElement;
-        const residentsListDiv = this.shadow.getElementById('residentsList') as HTMLDivElement;
-        const emptyStateDiv = this.shadow.getElementById('emptyState') as HTMLDivElement;
-        const errorDiv = this.shadow.getElementById('error') as HTMLDivElement;
-        const refreshBtn = this.shadow.getElementById('refreshBtn') as HTMLButtonElement;
+    async loadResidents() {
+        const loadingDiv = this.shadowRoot.getElementById('loading');
+        const residentsListDiv = this.shadowRoot.getElementById('residentsList');
+        const emptyStateDiv = this.shadowRoot.getElementById('emptyState');
+        const errorDiv = this.shadowRoot.getElementById('error');
+        const refreshBtn = this.shadowRoot.getElementById('refreshBtn');
         
         try {
             loadingDiv.style.display = 'block';
@@ -211,9 +199,9 @@ class ResidentList extends HTMLElement {
         }
     }
 
-    private renderResidents(): void {
-        const residentsListDiv = this.shadow.getElementById('residentsList') as HTMLDivElement;
-        const emptyStateDiv = this.shadow.getElementById('emptyState') as HTMLDivElement;
+    renderResidents() {
+        const residentsListDiv = this.shadowRoot.getElementById('residentsList');
+        const emptyStateDiv = this.shadowRoot.getElementById('emptyState');
         
         if (this.residents.length === 0) {
             residentsListDiv.style.display = 'none';
@@ -230,7 +218,7 @@ class ResidentList extends HTMLElement {
         this.setupDeleteListeners();
     }
 
-    private createResidentHTML(resident: Resident): string {
+    createResidentHTML(resident) {
         const dateOfBirth = resident.dateOfBirth ? new Date(resident.dateOfBirth).toLocaleDateString() : 'Not provided';
         const filesCount = (resident.fileRefs && Array.isArray(resident.fileRefs)) ? resident.fileRefs.length : 0;
         
@@ -264,21 +252,20 @@ class ResidentList extends HTMLElement {
         `;
     }
 
-    private setupDeleteListeners(): void {
-        const deleteButtons = this.shadow.querySelectorAll('.delete-button');
+    setupDeleteListeners() {
+        const deleteButtons = this.shadowRoot.querySelectorAll('.delete-button');
         
         deleteButtons.forEach(button => {
-            button.addEventListener('click', async (e: Event) => {
-                const target = e.target as HTMLButtonElement;
-                const id = target.getAttribute('data-id');
-                if (id && confirm('Are you sure you want to delete this resident?')) {
-                    await this.deleteResident(parseInt(id));
+            button.addEventListener('click', async (e) => {
+                const id = e.target.getAttribute('data-id');
+                if (confirm('Are you sure you want to delete this resident?')) {
+                    await this.deleteResident(id);
                 }
             });
         });
     }
 
-    private async deleteResident(id: number): Promise<void> {
+    async deleteResident(id) {
         try {
             const response = await fetch(`http://localhost:5000/residents/${id}`, {
                 method: 'DELETE'
@@ -289,7 +276,7 @@ class ResidentList extends HTMLElement {
             }
 
             // Remove from local array
-            this.residents = this.residents.filter(r => r.id !== id);
+            this.residents = this.residents.filter(r => r.id != id);
             this.renderResidents();
             
         } catch (error) {
@@ -298,7 +285,7 @@ class ResidentList extends HTMLElement {
         }
     }
 
-    private escapeHtml(text: string): string {
+    escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
