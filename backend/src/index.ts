@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import residentRoutes from "./routes/residentRoutes";
 import staffRoutes from "./routes/staffRoutes";
+import taskRoutes from "./routes/taskRoutes";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/", (_req, res) => {
 // Register routes
 app.use("/residents", residentRoutes);
 app.use("/staff", staffRoutes);
+app.use("/tasks", taskRoutes);
 
 // Start server
 app.listen(5000, () => {

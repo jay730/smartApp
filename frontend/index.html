@@ -32,6 +32,7 @@
         Residents
       </button>
       <button onclick="showPage(event, 'staff')">Staff</button>
+      <button onclick="showPage(event, 'tasks')">Tasks</button>
     </div>
 
     <!-- Residents Page -->
@@ -52,7 +53,17 @@
       <staff-list></staff-list>
     </div>
 
-    <script>
+    <!-- Tasks Page -->
+    <div id="tasks-page" class="page">
+      <h2>Add Task</h2>
+      <task-form></task-form>
+
+      <h2>Tasks</h2>
+      <task-list></task-list>
+    </div>
+
+
+<script>
       function showPage(evt, pageName) {
         document
           .querySelectorAll(".page")
@@ -70,5 +81,7 @@
     <script src="dist/components/resident-list.js"></script>
     <script src="dist/components/staff-form.js"></script>
     <script src="dist/components/staff-list.js"></script>
+    <script src="dist/components/task-form.js"></script>
+    <script src="dist/components/task-list.js"></script>
   </body>
 </html>

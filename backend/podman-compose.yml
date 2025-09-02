@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: smartapp_postgres
+    environment:
+      POSTGRES_DB: toDoList
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - smartapp_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build: .
+    container_name: smartapp_backend
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASS: postgres123
+      DB_NAME: toDoList
+      PORT: 5000
+    volumes:
+      - ./uploads:/app/uploads:Z
+      - ./src:/app/src:Z
+      - ./knexfile.ts:/app/knexfile.ts:Z
+      - ./package.json:/app/package.json:Z
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - smartapp_network
+    restart: unless-stopped
+    command: npm run start
+
+volumes:
+  postgres_data:
+
+networks:
+  smartapp_network:
+    driver: bridge

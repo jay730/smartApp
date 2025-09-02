@@ -95,6 +95,7 @@ export const updateResidentController = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id, 10);
     const data = req.body || {};
 
+    // Handle file uploads if present
     if (req.files && Array.isArray(req.files)) {
       const scanner = new VirusScanner();
       for (const file of req.files as Express.Multer.File[]) {
@@ -115,9 +116,8 @@ export const updateResidentController = async (req: Request, res: Response) => {
         );
       }
 
-      data.fileRefs = JSON.stringify(
-        (req.files as Express.Multer.File[]).map((f) => f.filename)
-      );
+      // Add file references to data
+      data.fileRefs = (req.files as Express.Multer.File[]).map((f) => f.filename);
     }
 
     const updatedResident = await ResidentService.updateResident(id, data);

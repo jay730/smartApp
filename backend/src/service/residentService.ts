@@ -61,27 +61,10 @@ export class ResidentService {
       throw new Error("Name cannot be empty");
     }
 
-    const fileRefs: string[] = [];
+    // Remove the files property before sending to repository
+    const { files, ...dataForUpdate } = data;
 
-    if (data.files && data.files.length > 0) {
-      for (const file of data.files) {
-        const result = await this.virusScanner.scanStream(
-          fs.createReadStream(file.path)
-        );
-        if (result.isInfected) {
-          fs.unlinkSync(file.path);
-          throw new Error(
-            `File ${file.originalname} is infected with ${result.signature}`
-          );
-        }
-        fileRefs.push(file.filename);
-      }
-
-      // Merge new fileRefs with existing ones if needed
-      data.fileRefs = fileRefs;
-    }
-
-    return ResidentRepository.updateResident(id, data);
+    return ResidentRepository.updateResident(id, dataForUpdate);
   }
 
   static async deleteResident(id: number): Promise<void> {
