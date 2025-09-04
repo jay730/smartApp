@@ -1,36 +1,32 @@
 export interface Task {
-  id: number;
+  id: number; // random 6-digit number
   title: string;
   description?: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status?: "pending" | "in_progress" | "completed" | "cancelled";
+  priority?: "low" | "medium" | "high" | "urgent";
   assignedTo?: number; // Staff ID
   assignedBy?: number; // Staff ID who created the task
   residentId?: number; // Associated resident
   dueDate?: Date;
   completedAt?: Date;
-  category: 'medical' | 'personal_care' | 'housekeeping' | 'maintenance' | 'social' | 'other';
+  category?:
+    | "medical"
+    | "personal_care"
+    | "housekeeping"
+    | "maintenance"
+    | "social"
+    | "other";
   tags?: string[];
-  fileRefs?: string[] | string; // Associated files
+  fileRefs?: string[];
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface CreateTaskRequest {
-  title: string;
-  description?: string;
-  status?: 'pending' | 'in_progress' | 'completed' | 'cancelled';
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-  assignedTo?: number;
-  assignedBy?: number;
-  residentId?: number;
-  dueDate?: string;
-  category: 'medical' | 'personal_care' | 'housekeeping' | 'maintenance' | 'social' | 'other';
-  tags?: string[];
-  notes?: string;
-}
+// For creation
+// export type TaskCreateData = Omit<Task, "id" | "createdAt" | "updatedAt">;
 
-export interface UpdateTaskRequest extends Partial<CreateTaskRequest> {
-  completedAt?: string;
-}
+// For updates
+// export type TaskUpdateData = Partial<
+//   Omit<Task, "id" | "createdAt" | "updatedAt">
+// >;

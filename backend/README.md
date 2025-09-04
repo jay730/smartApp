@@ -123,7 +123,7 @@ podman exec -it smartapp_postgres sh
 | `DB_HOST` | `postgres` | Database hostname |
 | `DB_PORT` | `5432` | Database port |
 | `DB_USER` | `postgres` | Database username |
-| `DB_PASS` | `postgres123` | Database password |
+| `DB_PASS` | `postgres` | Database password |
 | `DB_NAME` | `toDoList` | Database name |
 | `NODE_ENV` | `development` | Node.js environment |
 | `PORT` | `5000` | Backend API port |

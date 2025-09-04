@@ -71,7 +71,7 @@ The backend uses these environment variables (configured in podman-compose.yml):
 - `DB_HOST`: postgres (container name)
 - `DB_PORT`: 5432
 - `DB_USER`: postgres
-- `DB_PASS`: postgres123
+- `DB_PASS`: postgres
 - `DB_NAME`: toDoList
 - `NODE_ENV`: development
 - `PORT`: 5000
