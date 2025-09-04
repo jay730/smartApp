@@ -10,7 +10,7 @@ export class ResidentService {
       return await response.json();
     } catch (error) {
       console.error('Error fetching residents:', error);
-      return [];
+      throw error;
     }
   }
 

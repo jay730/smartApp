@@ -10,7 +10,7 @@ export class StaffService {
       return await response.json();
     } catch (error) {
       console.error('Error fetching staff:', error);
-      return [];
+      throw error;
     }
   }
 
@@ -22,7 +22,7 @@ export class StaffService {
       }
       return await response.json();
     } catch (error) {
-      console.error('Error fetching staff member:', error);
+      console.error('Error fetching staff:', error);
       throw error;
     }
   }
@@ -44,7 +44,7 @@ export class StaffService {
 
       return await response.json();
     } catch (error) {
-      console.error('Error creating staff member:', error);
+      console.error('Error creating staff:', error);
       throw error;
     }
   }
@@ -66,7 +66,7 @@ export class StaffService {
 
       return await response.json();
     } catch (error) {
-      console.error('Error updating staff member:', error);
+      console.error('Error updating staff:', error);
       throw error;
     }
   }
@@ -82,7 +82,7 @@ export class StaffService {
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error('Error deleting staff member:', error);
+      console.error('Error deleting staff:', error);
       throw error;
     }
   }

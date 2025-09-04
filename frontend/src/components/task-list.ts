@@ -1,282 +1,309 @@
-// src/components/task-list.ts
-interface Task {
-  id: number;
-  title: string;
-  description?: string;
-  category: string;
-  priority: string;
-  assignedTo?: number;
-  residentId?: number;
-  dueDate?: string;
-  status: string;
-  tags?: string[];
-  notes?: string;
-}
+import { TaskService } from "../services/task-service";
 
-class TaskList extends HTMLElement {
-  private static readonly API = "http://localhost:5000/tasks";
-  private tasks: Task[] = [];
-  private editingId: number | null = null;
+export class TaskList extends HTMLElement {
+  private taskService: TaskService;
+  private tasks: any[] = [];
+  private currentFilter: string = 'all';
+  private currentSort: string = 'created_at';
 
-  connectedCallback(): void {
+  constructor() {
+    super();
+    this.taskService = new TaskService();
+  }
+
+  connectedCallback() {
+    this.render();
+    this.loadTasks();
+    this.attachEventListeners();
+  }
+
+  private render() {
     this.innerHTML = `
-      <div>
-        <button id="refresh">Refresh</button>
+      <div class="task-list">
+        <div class="task-controls">
+          <div class="filter-controls">
+            <label for="statusFilter">Filter by Status:</label>
+            <select id="statusFilter">
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+
+            <label for="priorityFilter">Filter by Priority:</label>
+            <select id="priorityFilter">
+              <option value="all">All Priorities</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+
+            <label for="categoryFilter">Filter by Category:</label>
+            <select id="categoryFilter">
+              <option value="all">All Categories</option>
+              <option value="medical">Medical</option>
+              <option value="personal_care">Personal Care</option>
+              <option value="housekeeping">Housekeeping</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="social">Social</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="sort-controls">
+            <label for="sortBy">Sort by:</label>
+            <select id="sortBy">
+              <option value="created_at">Created Date</option>
+              <option value="dueDate">Due Date</option>
+              <option value="priority">Priority</option>
+              <option value="title">Title</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="task-stats">
+          <span class="stat">
+            <strong>Total:</strong> <span id="totalCount">0</span>
+          </span>
+          <span class="stat">
+            <strong>Pending:</strong> <span id="pendingCount">0</span>
+          </span>
+          <span class="stat">
+            <strong>In Progress:</strong> <span id="inProgressCount">0</span>
+          </span>
+          <span class="stat">
+            <strong>Completed:</strong> <span id="completedCount">0</span>
+          </span>
+          <span class="stat">
+            <strong>Overdue:</strong> <span id="overdueCount">0</span>
+          </span>
+        </div>
+
+        <div class="tasks-container" id="tasksContainer">
+          <div class="loading">Loading tasks...</div>
+        </div>
       </div>
-      <div id="status" style="margin:8px 0;"></div>
-      <ul id="list"></ul>
     `;
-
-    this.querySelector("#refresh")?.addEventListener("click", () =>
-      this.load()
-    );
-    document.addEventListener("taskCreated", () => this.load());
-    this.load();
   }
 
-  private async load(): Promise<void> {
-    const status = this.querySelector("#status") as HTMLDivElement | null;
-    const list = this.querySelector("#list") as HTMLUListElement | null;
-    if (!status || !list) return;
-
-    status.textContent = "Loading...";
-    list.innerHTML = "";
-
+  private async loadTasks() {
     try {
-      const res = await fetch(TaskList.API);
-      const data = await res.json();
-      console.log("Tasks from API:", data); // <- debug log
-      this.tasks = Array.isArray(data) ? data : data.tasks || [];
-      this.renderList();
-    } catch (err) {
-      console.error("Failed to load tasks:", err);
-      status.textContent = "Failed to load tasks";
+      this.tasks = await this.taskService.getAllTasks();
+      this.updateDisplay();
+      this.updateStats();
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+      this.showError('Error loading tasks. Please try again.');
     }
   }
 
-  private renderList(): void {
-    const list = this.querySelector("#list") as HTMLUListElement | null;
-    const status = this.querySelector("#status") as HTMLDivElement | null;
-    if (!list || !status) return;
+  private updateDisplay() {
+    const container = this.querySelector('#tasksContainer') as HTMLElement;
+    if (!container) return;
 
-    status.textContent = this.tasks.length ? "" : "No tasks";
+    const filteredTasks = this.filterTasks();
+    const sortedTasks = this.sortTasks(filteredTasks);
 
-    list.innerHTML = this.tasks
-      .map((task) => {
-        if (this.editingId === task.id) {
-          // EDIT MODE
-          return `
-            <li data-id="${task.id}">
-              <div>
-                <label>Title</label>
-                <input name="title" value="${this.escape(task.title)}" />
-              </div>
-              <div>
-                <label>Category</label>
-                <select name="category">
-                  <option value="medical" ${
-                    task.category === "medical" ? "selected" : ""
-                  }>Medical</option>
-                  <option value="personal_care" ${
-                    task.category === "personal_care" ? "selected" : ""
-                  }>Personal Care</option>
-                  <option value="housekeeping" ${
-                    task.category === "housekeeping" ? "selected" : ""
-                  }>Housekeeping</option>
-                  <option value="maintenance" ${
-                    task.category === "maintenance" ? "selected" : ""
-                  }>Maintenance</option>
-                  <option value="social" ${
-                    task.category === "social" ? "selected" : ""
-                  }>Social</option>
-                  <option value="other" ${
-                    task.category === "other" ? "selected" : ""
-                  }>Other</option>
-                </select>
-              </div>
-              <div>
-                <label>Priority</label>
-                <select name="priority">
-                  <option value="low" ${
-                    task.priority === "low" ? "selected" : ""
-                  }>Low</option>
-                  <option value="medium" ${
-                    task.priority === "medium" ? "selected" : ""
-                  }>Medium</option>
-                  <option value="high" ${
-                    task.priority === "high" ? "selected" : ""
-                  }>High</option>
-                  <option value="urgent" ${
-                    task.priority === "urgent" ? "selected" : ""
-                  }>Urgent</option>
-                </select>
-              </div>
-              <div>
-                <label>Due Date</label>
-                <input type="date" name="dueDate" value="${
-                  task.dueDate ? task.dueDate.split("T")[0] : ""
-                }" />
-              </div>
-              <div>
-                <label>Status</label>
-                <select name="status">
-                  <option value="pending" ${
-                    task.status === "pending" ? "selected" : ""
-                  }>Pending</option>
-                  <option value="in_progress" ${
-                    task.status === "in_progress" ? "selected" : ""
-                  }>In Progress</option>
-                  <option value="completed" ${
-                    task.status === "completed" ? "selected" : ""
-                  }>Completed</option>
-                  <option value="cancelled" ${
-                    task.status === "cancelled" ? "selected" : ""
-                  }>Cancelled</option>
-                </select>
-              </div>
-              <button data-save="${task.id}">Save</button>
-              <button data-cancel="${task.id}">Cancel</button>
-            </li>
-          `;
-        }
+    if (sortedTasks.length === 0) {
+      container.innerHTML = '<div class="no-tasks">No tasks found.</div>';
+      return;
+    }
 
-        // VIEW MODE
-        return `
-          <li data-id="${task.id}">
-            <strong>${this.escape(task.title)}</strong> — ${task.category} — ${
-          task.priority
-        } — Status: ${task.status}
-            <button data-edit="${task.id}">Edit</button>
-            <button data-del="${task.id}">Delete</button>
-            ${
-              task.status !== "completed"
-                ? `<button data-complete="${task.id}">Complete</button>`
-                : ""
-            }
-          </li>
-        `;
-      })
-      .join("");
-
-    this.attachItemHandlers();
+    container.innerHTML = sortedTasks.map(task => this.renderTaskCard(task)).join('');
   }
 
-  private attachItemHandlers(): void {
-    const list = this.querySelector("#list") as HTMLUListElement | null;
-    if (!list) return;
+  private filterTasks() {
+    let filtered = [...this.tasks];
 
-    list.querySelectorAll("[data-edit]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const idAttr = (btn as HTMLElement).getAttribute("data-edit");
-        if (!idAttr) return;
-        this.editingId = Number(idAttr);
-        this.renderList();
-      });
-    });
+    const statusFilter = (this.querySelector('#statusFilter') as HTMLSelectElement)?.value;
+    const priorityFilter = (this.querySelector('#priorityFilter') as HTMLSelectElement)?.value;
+    const categoryFilter = (this.querySelector('#categoryFilter') as HTMLSelectElement)?.value;
 
-    list.querySelectorAll("[data-cancel]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        this.editingId = null;
-        this.renderList();
-      });
-    });
+    if (statusFilter && statusFilter !== 'all') {
+      filtered = filtered.filter(task => task.status === statusFilter);
+    }
 
-    list.querySelectorAll("[data-save]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const idAttr = (btn as HTMLElement).getAttribute("data-save");
-        if (!idAttr) return;
-        await this.saveTask(Number(idAttr));
-      });
-    });
+    if (priorityFilter && priorityFilter !== 'all') {
+      filtered = filtered.filter(task => task.priority === priorityFilter);
+    }
 
-    list.querySelectorAll("[data-del]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const idAttr = (btn as HTMLElement).getAttribute("data-del");
-        if (!idAttr) return;
-        await this.deleteTask(Number(idAttr));
-      });
-    });
+    if (categoryFilter && categoryFilter !== 'all') {
+      filtered = filtered.filter(task => task.category === categoryFilter);
+    }
 
-    list.querySelectorAll("[data-complete]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const idAttr = (btn as HTMLElement).getAttribute("data-complete");
-        if (!idAttr) return;
-        await this.completeTask(Number(idAttr));
-      });
+    return filtered;
+  }
+
+  private sortTasks(tasks: any[]) {
+    const sortBy = (this.querySelector('#sortBy') as HTMLSelectElement)?.value || 'created_at';
+    
+    return [...tasks].sort((a, b) => {
+      switch (sortBy) {
+        case 'created_at':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'dueDate':
+          if (!a.dueDate && !b.dueDate) return 0;
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        case 'priority':
+          const priorityOrder: { [key: string]: number } = { urgent: 4, high: 3, medium: 2, low: 1 };
+          return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+        case 'title':
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
     });
   }
 
-  private async saveTask(id: number): Promise<void> {
-    const li = this.querySelector(
-      `li[data-id="${id}"]`
-    ) as HTMLLIElement | null;
-    if (!li) return;
+  private renderTaskCard(task: any) {
+    const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && 
+                     !['completed', 'cancelled'].includes(task.status);
+    
+    const priorityClass = `priority-${task.priority}`;
+    const statusClass = `status-${task.status}`;
+    const overdueClass = isOverdue ? 'overdue' : '';
 
-    const payload = {
-      title:
-        (li.querySelector('input[name="title"]') as HTMLInputElement)?.value ||
-        "",
-      category:
-        (li.querySelector('select[name="category"]') as HTMLSelectElement)
-          ?.value || "",
-      priority:
-        (li.querySelector('select[name="priority"]') as HTMLSelectElement)
-          ?.value || "medium",
-      dueDate:
-        (li.querySelector('input[name="dueDate"]') as HTMLInputElement)
-          ?.value || null,
-      status:
-        (li.querySelector('select[name="status"]') as HTMLSelectElement)
-          ?.value || "pending",
-    };
+    return `
+      <div class="task-card ${priorityClass} ${statusClass} ${overdueClass}" data-task-id="${task.id}">
+        <div class="task-header">
+          <h4 class="task-title">${this.escapeHtml(task.title)}</h4>
+          <div class="task-badges">
+            <span class="badge priority-badge ${priorityClass}">${task.priority}</span>
+            <span class="badge status-badge ${statusClass}">${task.status.replace('_', ' ')}</span>
+            <span class="badge category-badge">${task.category.replace('_', ' ')}</span>
+            ${isOverdue ? '<span class="badge overdue-badge">OVERDUE</span>' : ''}
+          </div>
+        </div>
 
-    try {
-      const res = await fetch(`${TaskList.API}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("Update failed");
-      this.editingId = null;
-      await this.load();
-    } catch (err) {
-      console.error("Task update error", err);
-      alert("Update failed");
+        ${task.description ? `<p class="task-description">${this.escapeHtml(task.description)}</p>` : ''}
+        
+        <div class="task-details">
+          ${task.assignedTo ? `<div class="detail"><strong>Assigned to:</strong> Staff #${task.assignedTo}</div>` : ''}
+          ${task.residentId ? `<div class="detail"><strong>Resident:</strong> Resident #${task.residentId}</div>` : ''}
+          ${task.dueDate ? `<div class="detail"><strong>Due:</strong> ${new Date(task.dueDate).toLocaleDateString()}</div>` : ''}
+          ${task.tags && task.tags.length > 0 ? `<div class="detail"><strong>Tags:</strong> ${task.tags.map((t: string) => `<span class="tag">${this.escapeHtml(t)}</span>`).join('')}</div>` : ''}
+          ${task.notes ? `<div class="detail"><strong>Notes:</strong> ${this.escapeHtml(task.notes)}</div>` : ''}
+        </div>
+
+        <div class="task-actions">
+          <button class="btn-edit" onclick="this.closest('.task-list').editTask(${task.id})">
+            Edit
+          </button>
+          <button class="btn-delete" onclick="this.closest('.task-list').deleteTask(${task.id})">
+            Delete
+          </button>
+          ${task.status !== 'completed' ? `<button class="btn-complete" onclick="this.closest('.task-list').completeTask(${task.id})">Complete</button>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  private updateStats() {
+    const total = this.tasks.length;
+    const pending = this.tasks.filter(t => t.status === 'pending').length;
+    const inProgress = this.tasks.filter(t => t.status === 'in_progress').length;
+    const completed = this.tasks.filter(t => t.status === 'completed').length;
+    const overdue = this.tasks.filter(t => 
+      t.dueDate && new Date(t.dueDate) < new Date() && 
+      !['completed', 'cancelled'].includes(t.status)
+    ).length;
+
+    const totalEl = this.querySelector('#totalCount');
+    const pendingEl = this.querySelector('#pendingCount');
+    const inProgressEl = this.querySelector('#inProgressCount');
+    const completedEl = this.querySelector('#completedCount');
+    const overdueEl = this.querySelector('#overdueCount');
+
+    if (totalEl) totalEl.textContent = total.toString();
+    if (pendingEl) pendingEl.textContent = pending.toString();
+    if (inProgressEl) inProgressEl.textContent = inProgress.toString();
+    if (completedEl) completedEl.textContent = completed.toString();
+    if (overdueEl) overdueEl.textContent = overdue.toString();
+  }
+
+  private attachEventListeners() {
+    const statusFilter = this.querySelector('#statusFilter');
+    const priorityFilter = this.querySelector('#priorityFilter');
+    const categoryFilter = this.querySelector('#categoryFilter');
+    const sortBy = this.querySelector('#sortBy');
+
+    [statusFilter, priorityFilter, categoryFilter, sortBy].forEach(filter => {
+      if (filter) {
+        filter.addEventListener('change', () => {
+          this.updateDisplay();
+        });
+      }
+    });
+  }
+
+  public async editTask(taskId: number) {
+    const task = this.tasks.find(t => t.id === taskId);
+    if (task) {
+      this.dispatchEvent(new CustomEvent('editTask', { detail: { task } }));
     }
   }
 
-  private async deleteTask(id: number): Promise<void> {
-    if (!confirm("Delete this task?")) return;
-    try {
-      const res = await fetch(`${TaskList.API}/${id}`, { method: "DELETE" });
-      if (res.ok) this.load();
-      else alert("Delete failed");
-    } catch (err) {
-      console.error("Task delete error", err);
-      alert("Delete failed");
+  public async deleteTask(taskId: number) {
+    if (confirm('Are you sure you want to delete this task?')) {
+      try {
+        await this.taskService.deleteTask(taskId);
+        this.tasks = this.tasks.filter(t => t.id !== taskId);
+        this.updateDisplay();
+        this.updateStats();
+        this.showMessage('Task deleted successfully!', 'success');
+      } catch (error) {
+        console.error('Error deleting task:', error);
+        this.showError('Error deleting task. Please try again.');
+      }
     }
   }
 
-  private async completeTask(id: number): Promise<void> {
+  public async completeTask(taskId: number) {
     try {
-      const res = await fetch(`${TaskList.API}/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "completed" }),
-      });
-      if (!res.ok) throw new Error("Complete failed");
-      await this.load();
-    } catch (err) {
-      console.error("Task complete error", err);
-      alert("Complete failed");
+      await this.taskService.updateTask(taskId, { status: 'completed' });
+      const task = this.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.status = 'completed';
+        task.completedAt = new Date().toISOString();
+      }
+      this.updateDisplay();
+      this.updateStats();
+      this.showMessage('Task marked as completed!', 'success');
+    } catch (error) {
+      console.error('Error completing task:', error);
+      this.showError('Error completing task. Please try again.');
     }
   }
 
-  private escape(s: string | undefined | null): string {
-    const d = document.createElement("div");
-    d.textContent = s ?? "";
-    return d.innerHTML;
+  public refreshTasks() {
+    this.loadTasks();
+  }
+
+  private showMessage(message: string, type: 'success' | 'error') {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message message-${type}`;
+    messageDiv.textContent = message;
+    
+    this.appendChild(messageDiv);
+    
+    setTimeout(() => {
+      messageDiv.remove();
+    }, 3000);
+  }
+
+  private showError(message: string) {
+    this.showMessage(message, 'error');
   }
 }
 
-customElements.define("task-list", TaskList);
+customElements.define('task-list', TaskList);
