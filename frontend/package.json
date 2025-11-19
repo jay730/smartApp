@@ -1,15 +1,13 @@
 {
   "name": "frontend",
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "npx http-server . -p 3000 -o -f index.html -a localhost",
     "build": "tsc",
-    "preview": "npx http-server . -p 3000 -f index.html"
+    "start": "npx http-server . -p 3000 -o -f index.html -a localhost"
   },
   "devDependencies": {
     "typescript": "^5.9.2",
     "http-server": "^14.1.1"
   },
-  "description": "Frontend with native TypeScript web components only"
+  "description": "Simple vanilla TypeScript frontend"
 }

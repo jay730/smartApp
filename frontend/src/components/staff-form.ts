@@ -1,85 +1,67 @@
-// src/components/staff-form.ts
+// Professional Staff Registration Form
 class StaffForm extends HTMLElement {
-  private static readonly API = "http://localhost:5000/staff";
-
-  connectedCallback(): void {
+  connectedCallback() {
     this.innerHTML = `
-			<form id="staffForm">
-				<div>
-					<label>Name</label>
-					<input id="name" required />
-				</div>
-				<div>
-					<label>Role</label>
-					<select id="role" required>
-						<option value="">Select</option>
-						<option value="caregiver">caregiver</option>
-						<option value="nurse">nurse</option>
-						<option value="admin">admin</option>
-					</select>
-				</div>
-				<div>
-					<label>Assigned Resident IDs (comma-separated)</label>
-					<input id="residentIds" placeholder="e.g. 1,2,3" />
-				</div>
-				<div>
-					<label>Files (optional)</label>
-					<input id="files" type="file" multiple />
-				</div>
-				<button type="submit">Add Staff</button>
-				<div id="msg" style="margin-top:8px;"></div>
-			</form>
-		`;
+      <div style="background: white; border: 1px solid #ccc; padding: 20px; margin: 10px;">
+        <h3>Add Staff</h3>
+        <form id="staffForm">
+          <div style="margin: 10px 0;">
+            <label>Name:</label><br>
+            <input type="text" id="name" required style="width: 200px; padding: 5px;">
+          </div>
+          <div style="margin: 10px 0;">
+            <label>Position:</label><br>
+            <select id="role" required style="width: 200px; padding: 5px;">
+              <option value="">Select Position</option>
+              <option value="nurse">Nurse</option>
+              <option value="doctor">Doctor</option>
+              <option value="aide">Nursing Aide</option>
+              <option value="therapist">Therapist</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+          <button type="submit" style="background: #2c5aa0; color: white; padding: 10px 20px; border: none;">
+            Add Staff
+          </button>
+          <div id="message" style="margin-top: 10px; color: green;"></div>
+        </form>
+      </div>
+    `;
 
-    const form = this.querySelector("#staffForm") as HTMLFormElement | null;
-    const msg = this.querySelector("#msg") as HTMLDivElement | null;
-    if (!form || !msg) return;
-
-    form.addEventListener("submit", async (e: Event) => {
+    const form = this.querySelector('#staffForm') as HTMLFormElement;
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      msg.textContent = "Saving...";
-
-      const fd = new FormData();
-      fd.append(
-        "name",
-        (this.querySelector("#name") as HTMLInputElement).value.trim()
-      );
-      fd.append(
-        "role",
-        (this.querySelector("#role") as HTMLSelectElement).value
-      );
-
-      // Parse IDs as numbers, append as repeated "assignedResidents"
-      const idsRaw = (
-        this.querySelector("#residentIds") as HTMLInputElement
-      ).value.trim();
-      const ids = idsRaw
-        ? idsRaw
-            .split(",")
-            .map((s) => parseInt(s.trim(), 10))
-            .filter((n) => Number.isFinite(n))
-        : [];
-      ids.forEach((n) => fd.append("assignedResidents", String(n)));
-
-      // Files must use key "file"
-      const filesInput = this.querySelector("#files") as HTMLInputElement;
-      Array.from(filesInput.files || []).forEach((file) => {
-        fd.append("file", file);
-      });
-
+      
+      const name = (this.querySelector('#name') as HTMLInputElement).value;
+      const role = (this.querySelector('#role') as HTMLSelectElement).value;
+      
+      const message = this.querySelector('#message') as HTMLDivElement;
+      message.textContent = 'Saving...';
+      
       try {
-        const res = await fetch(StaffForm.API, { method: "POST", body: fd });
-        if (!res.ok) throw new Error(`Create failed: ${res.status}`);
-        msg.textContent = "Staff added";
-        form.reset();
-        document.dispatchEvent(new CustomEvent("staffAdded"));
-        setTimeout(() => (msg.textContent = ""), 1200);
-      } catch (err) {
-        console.error("[StaffForm] create error", err);
-        msg.textContent = "Failed to add staff";
+        const response = await fetch('http://localhost:5000/staff', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: name,
+            role: role
+          })
+        });
+        
+        if (response.ok) {
+          message.textContent = 'Staff member added successfully!';
+          form.reset();
+          window.dispatchEvent(new CustomEvent('staffAdded'));
+        } else {
+          message.textContent = 'Error: Could not add staff member';
+        }
+      } catch (error) {
+        message.textContent = 'Error: Could not connect to server';
       }
     });
   }
 }
 
-customElements.define("staff-form", StaffForm);
+customElements.define('staff-form', StaffForm);
