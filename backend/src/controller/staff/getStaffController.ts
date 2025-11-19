@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { StaffService } from "../../service/staffService";
+import { StaffRepository } from "../../repository/staffRepository";
 
 export const getStaffController = async (req: Request, res: Response) => {
   try {
-    const staffs = await StaffService.getAllStaff();
+    const staffs = await StaffRepository.getAllStaff();
     res.json(staffs);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

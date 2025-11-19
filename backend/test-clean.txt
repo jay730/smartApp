@@ -1,4 +1,0 @@
-This is a clean test file.
-It contains only safe content.
-No threats or malicious code here.
-Perfect for testing the scanner.

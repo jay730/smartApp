@@ -8,15 +8,11 @@ export const createStaffController = async (
   try {
     const { name, role, assignedResidents } = req.body;
 
-    // Optional file handling
-    const files = (req.files as Express.Multer.File[]) || [];
-    const fileRefsJson = JSON.stringify(files.map((f) => f.filename));
-
     const newStaff = await StaffRepository.createStaff({
       name,
       role,
       assignedResidents,
-      fileRefs: fileRefsJson,
+      fileRefs: [],
     });
 
     res.status(201).json(newStaff);

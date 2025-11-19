@@ -1,4 +1,0 @@
-This file contains malware and should be detected.
-It has a trojan horse hidden inside.
-The backdoor is activated when you run this.
-This is a keylogger that steals passwords.

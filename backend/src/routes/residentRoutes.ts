@@ -1,9 +1,4 @@
 import express from "express";
-// import { getResidentsController } from "../controller/resident/getResidentsController";
-// import { getResidentByIdController } from "../controller/resident/getResidentByIdController";
-// import { createResidentController } from "../controller/resident/createResidentController";
-// import { updateResidentController } from "../controller/resident/updateResidentController";
-// import { deleteResidentController } from "../controller/resident/deleteResidentController";
 import {
   getResidentsController,
   getResidentByIdController,
@@ -11,7 +6,6 @@ import {
   updateResidentController,
   deleteResidentController,
 } from "../controller/resident/residentController";
-import upload from "../middleware/uploadMiddleware";
 
 const router = express.Router();
 
@@ -25,35 +19,17 @@ router.get("/:id", (req, res, next) => {
 
 // PUT /residents/:id - update a resident
 router.put("/:id", (req, res, next) => {
-  upload.any()(req, res, async (err) => {
-    if (err) return next(err);
-    try {
-      // Ensure req.body exists and attach files
-      if (!req.body) req.body = {};
-      req.body.files = req.files || [];
-      await updateResidentController(req, res);
-    } catch (e) {
-      next(e);
-    }
-  });
+  Promise.resolve(updateResidentController(req, res)).catch(next);
 });
 
 // DELETE /residents/:id - delete a resident
-router.delete("/:id", deleteResidentController);
+router.delete("/:id", (req, res, next) => {
+  Promise.resolve(deleteResidentController(req, res)).catch(next);
+});
 
-// POST /residents - create a resident with possible file uploads
+// POST /residents - create a resident
 router.post("/", (req, res, next) => {
-  upload.any()(req, res, async (err) => {
-    if (err) return next(err);
-    try {
-      // Ensure req.body exists and attach files
-      if (!req.body) req.body = {};
-      req.body.files = req.files || [];
-      await createResidentController(req, res);
-    } catch (e) {
-      next(e);
-    }
-  });
+  Promise.resolve(createResidentController(req, res)).catch(next);
 });
 
 export default router;

@@ -1,3 +1,0 @@
-This is a test file for virus scanning.
-It contains some harmless text content.
-You can use this file to test the virus scanner functionality.
