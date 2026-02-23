@@ -25,6 +25,7 @@ function normalizeTask(task: Task): Task {
 
 export class TaskRepository {
   static async createTask(data: CreateTaskRequest): Promise<Task> {
+    
     const insertData: any = {
       ...data,
       status: data.status || 'pending',
@@ -32,12 +33,17 @@ export class TaskRepository {
       tags: data.tags ? JSON.stringify(data.tags) : '[]',
       fileRefs: '[]'
     };
-
-    const [newTask] = await knex<Task>("tasks")
+    console.log("Insert data:", insertData);
+    try{
+      const [newTask] = await knex<Task>("tasks")
       .insert(insertData)
       .returning("*");
 
     return normalizeTask(newTask);
+    } catch(err){
+      console.log("DB insert error:", err);
+      throw err;
+    }
   }
 
   static async getAllTasks(): Promise<Task[]> {

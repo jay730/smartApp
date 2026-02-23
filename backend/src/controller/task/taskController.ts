@@ -18,7 +18,7 @@ export const getTaskByIdController = async (req: Request, res: Response) => {
     if (isNaN(id)) {
       return res.status(400).json({ error: "Invalid ID. Must be a number." });
     }
-
+    
     const task = await TaskRepository.getTaskById(id);
     if (!task) {
       return res.status(404).json({ error: "Task not found." });
@@ -41,7 +41,7 @@ export const createTaskController = async (req: Request, res: Response) => {
         error: "Title and category are required fields." 
       });
     }
-
+    console.log("Task data going to repository:", taskData);
     const task = await TaskRepository.createTask(taskData);
     res.status(201).json(task);
   } catch (err: any) {
