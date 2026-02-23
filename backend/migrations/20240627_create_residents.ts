@@ -23,7 +23,7 @@ export async function up(knex: Knex): Promise<void> {
 
   // Create tasks table with random 6-digit ID (manually supplied)
   await knex.schema.createTable("tasks", (table) => {
-    table.integer("id").primary(); // manually supplied 6-digit number
+    table.increments("id").primary(); // manually supplied 6-digit number
     table.string("title").notNullable();
     table.text("description");
     table

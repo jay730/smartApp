@@ -7,11 +7,15 @@ class TaskForm extends HTMLElement {
         <form id="taskForm">
           <div style="margin: 10px 0;">
             <label>Task:</label><br>
-            <input type="text" id="title" required style="width: 300px; padding: 5px;">
+            <input type="text" id="title" name="title" required style="width: 300px; padding: 5px;">
+          </div>
+          <div>
+          <label>Description:</label><br>
+          <textarea id="description" name="description"></textarea>
           </div>
           <div style="margin: 10px 0;">
             <label>Category:</label><br>
-            <select id="category" required style="width: 200px; padding: 5px;">
+            <select id="category" name="category" required style="width: 200px; padding: 5px;">
               <option value="">Select Category</option>
               <option value="medical">Medical</option>
               <option value="personal">Personal Care</option>
@@ -22,7 +26,7 @@ class TaskForm extends HTMLElement {
           </div>
           <div style="margin: 10px 0;">
             <label>Priority:</label><br>
-            <select id="priority" style="width: 200px; padding: 5px;">
+            <select id="priority" name="priority" style="width: 200px; padding: 5px;">
               <option value="low">Low</option>
               <option value="medium" selected>Medium</option>
               <option value="high">High</option>
@@ -39,29 +43,24 @@ class TaskForm extends HTMLElement {
     const form = this.querySelector('#taskForm') as HTMLFormElement;
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const title = (this.querySelector('#title') as HTMLInputElement).value;
-      const description = (this.querySelector('#description') as HTMLTextAreaElement).value;
-      const priority = (this.querySelector('#priority') as HTMLSelectElement).value;
-      const category = (this.querySelector('#category') as HTMLSelectElement).value;
-      
-      const message = this.querySelector('#message') as HTMLDivElement;
+      const formData = new FormData(form);
+      const title = formData.get('title') as string;
+      const description = formData.get('description') as string;
+      const priority = formData.get('priority') as string;
+      const category = formData.get('category') as string;
+      const message = form.querySelector('#message') as HTMLDivElement;
       message.textContent = 'Saving...';
-      
       try {
         const response = await fetch('http://localhost:5000/tasks', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            title: title,
-            description: description,
-            priority: priority,
-            category: category
+            title,
+            description,
+            priority,
+            category
           })
         });
-        
         if (response.ok) {
           message.textContent = 'Task added successfully!';
           form.reset();
@@ -69,7 +68,7 @@ class TaskForm extends HTMLElement {
         } else {
           message.textContent = 'Error: Could not add task';
         }
-      } catch (error) {
+      } catch {
         message.textContent = 'Error: Could not connect to server';
       }
     });
