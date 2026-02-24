@@ -1,9 +1,9 @@
 import express from "express";
-import { getStaffController } from "../controller/staff/getStaffController";
-import { getStaffByIdController } from "../controller/staff/getStaffIdController";
-import { createStaffController } from "../controller/staff/createStaffController";
-import { updateStaffController } from "../controller/staff/updateStaffController";
-import { deleteStaffController } from "../controller/staff/deleteStaffContoller";
+import { getStaffController } from "../controller/staff/staffController";
+import { getStaffByIdController } from "../controller/staff/staffController";
+import { createStaffController } from "../controller/staff/staffController";
+import { updateStaffController } from "../controller/staff/staffController";
+import { deleteStaffController } from "../controller/staff/staffController";
 
 const router = express.Router();
 
