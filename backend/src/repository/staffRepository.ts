@@ -1,8 +1,6 @@
 // repository/staffRepository.ts
-import db from "../db";
 import type { Staff } from "../model/staffInterface";
-
-import knex from "../db";
+import pool from "../db";
 function normalizeFileRefs(staff: Staff): Staff {
   if (typeof staff.fileRefs === "string") {
     try {
@@ -16,18 +14,32 @@ function normalizeFileRefs(staff: Staff): Staff {
 
 export class StaffRepository {
   static async createStaff(data: Omit<Staff, "id">): Promise<Staff> {
-    const [newStaff] = await knex<Staff>("staff").insert(data).returning("*");
-
-    return normalizeFileRefs(newStaff);
+    const { name, role, assignedResidents, fileRefs } = data;
+    const result = await pool.query<Staff>(
+      `INSERT INTO staff (name, role, assignedResidents, fileRefs)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [
+        name,
+        role,
+        assignedResidents ?? null,
+        JSON.stringify(fileRefs ?? []),
+      ]
+    );
+    return normalizeFileRefs(result.rows[0]);
   }
 
   static async getAllStaff(): Promise<Staff[]> {
-    const staffs = await knex<Staff>("staff").select("*");
-    return staffs.map(normalizeFileRefs);
+    const result = await pool.query<Staff>(`SELECT * FROM staff`);
+    return result.rows.map(normalizeFileRefs);
   }
 
   static async getStaffById(id: number): Promise<Staff | undefined> {
-    const staff = await knex<Staff>("staff").where({ id }).first();
+    const result = await pool.query<Staff>(
+      `SELECT * FROM staff WHERE id = $1 LIMIT 1`,
+      [id]
+    );
+    const staff = result.rows[0];
     return staff ? normalizeFileRefs(staff) : undefined;
   }
 
@@ -35,14 +47,29 @@ export class StaffRepository {
     id: number,
     data: Partial<Omit<Staff, "id">>
   ): Promise<Staff | undefined> {
-    const [updated] = await knex<Staff>("staff")
-      .where({ id })
-      .update(data)
-      .returning("*");
-    return updated;
+    const { name, role, assignedResidents, fileRefs } = data;
+    const result = await pool.query<Staff>(
+      `UPDATE staff
+       SET
+         name = COALESCE($2, name),
+         role = COALESCE($3, role),
+         assignedResidents = COALESCE($4, assignedResidents),
+         fileRefs = COALESCE($5, fileRefs)
+       WHERE id = $1
+       RETURNING *`,
+      [
+        id,
+        name ?? null,
+        role ?? null,
+        assignedResidents ?? null,
+        fileRefs ? JSON.stringify(fileRefs) : null,
+      ]
+    );
+    const updated = result.rows[0];
+    return updated ? normalizeFileRefs(updated) : undefined;
   }
 
   static async deleteStaff(id: number): Promise<void> {
-    await knex<Staff>("staff").where({ id }).delete();
+    await pool.query(`DELETE FROM staff WHERE id = $1`, [id]);
   }
 }

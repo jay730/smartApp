@@ -1,5 +1,5 @@
 import { Task, CreateTaskRequest, UpdateTaskRequest } from "../model/taskInterface";
-import knex from "../db";
+import pool from "../db";
 
 function normalizeTask(task: Task): Task {
   // Normalize fileRefs if it's a string
@@ -35,11 +35,33 @@ export class TaskRepository {
     };
     console.log("Insert data:", insertData);
     try{
-      const [newTask] = await knex<Task>("tasks")
-      .insert(insertData)
-      .returning("*");
+      const result = await pool.query<Task>(
+        `INSERT INTO tasks (
+           title, description, status, priority, assignedTo, assignedBy, residentId,
+           dueDate, category, tags, fileRefs, notes
+         )
+         VALUES (
+           $1, $2, $3, $4, $5, $6, $7,
+           $8, $9, $10, $11, $12
+         )
+         RETURNING *`,
+        [
+          insertData.title,
+          insertData.description ?? null,
+          insertData.status,
+          insertData.priority,
+          insertData.assignedTo ?? null,
+          insertData.assignedBy ?? null,
+          insertData.residentId ?? null,
+          insertData.dueDate ?? null,
+          insertData.category,
+          insertData.tags,
+          insertData.fileRefs,
+          insertData.notes ?? null,
+        ]
+      );
 
-    return normalizeTask(newTask);
+    return normalizeTask(result.rows[0]);
     } catch(err){
       console.log("DB insert error:", err);
       throw err;
@@ -47,67 +69,70 @@ export class TaskRepository {
   }
 
   static async getAllTasks(): Promise<Task[]> {
-    const tasks = await knex<Task>("tasks")
-      .select("*")
-      .orderBy("created_at", "desc");
-    
-    return tasks.map(normalizeTask);
+    const result = await pool.query<Task>(
+      `SELECT * FROM tasks ORDER BY created_at DESC`
+    );
+    return result.rows.map(normalizeTask);
   }
 
   static async getTaskById(id: number): Promise<Task | undefined> {
-    const task = await knex<Task>("tasks").where({ id }).first();
+    const result = await pool.query<Task>(
+      `SELECT * FROM tasks WHERE id = $1 LIMIT 1`,
+      [id]
+    );
+    const task = result.rows[0];
     return task ? normalizeTask(task) : undefined;
   }
 
   static async getTasksByStatus(status: Task['status']): Promise<Task[]> {
-    const tasks = await knex<Task>("tasks")
-      .where({ status })
-      .orderBy("created_at", "desc");
-    
-    return tasks.map(normalizeTask);
+    const result = await pool.query<Task>(
+      `SELECT * FROM tasks WHERE status = $1 ORDER BY created_at DESC`,
+      [status]
+    );
+    return result.rows.map(normalizeTask);
   }
 
   static async getTasksByPriority(priority: Task['priority']): Promise<Task[]> {
-    const tasks = await knex<Task>("tasks")
-      .where({ priority })
-      .orderBy("created_at", "desc");
-    
-    return tasks.map(normalizeTask);
+    const result = await pool.query<Task>(
+      `SELECT * FROM tasks WHERE priority = $1 ORDER BY created_at DESC`,
+      [priority]
+    );
+    return result.rows.map(normalizeTask);
   }
 
   static async getTasksByCategory(category: Task['category']): Promise<Task[]> {
-    const tasks = await knex<Task>("tasks")
-      .where({ category })
-      .orderBy("created_at", "desc");
-    
-    return tasks.map(normalizeTask);
+    const result = await pool.query<Task>(
+      `SELECT * FROM tasks WHERE category = $1 ORDER BY created_at DESC`,
+      [category]
+    );
+    return result.rows.map(normalizeTask);
   }
 
   static async getTasksByStaff(staffId: number): Promise<Task[]> {
-    const tasks = await knex<Task>("tasks")
-      .where({ assignedTo: staffId })
-      .orderBy("created_at", "desc");
-    
-    return tasks.map(normalizeTask);
+    const result = await pool.query<Task>(
+      `SELECT * FROM tasks WHERE assignedTo = $1 ORDER BY created_at DESC`,
+      [staffId]
+    );
+    return result.rows.map(normalizeTask);
   }
 
   static async getTasksByResident(residentId: number): Promise<Task[]> {
-    const tasks = await knex<Task>("tasks")
-      .where({ residentId })
-      .orderBy("created_at", "desc");
-    
-    return tasks.map(normalizeTask);
+    const result = await pool.query<Task>(
+      `SELECT * FROM tasks WHERE residentId = $1 ORDER BY created_at DESC`,
+      [residentId]
+    );
+    return result.rows.map(normalizeTask);
   }
 
   static async getOverdueTasks(): Promise<Task[]> {
     const now = new Date();
-    const tasks = await knex<Task>("tasks")
-      .where("dueDate", "<", now)
-      .whereNot("status", "completed")
-      .whereNot("status", "cancelled")
-      .orderBy("dueDate", "asc");
-    
-    return tasks.map(normalizeTask);
+    const result = await pool.query<Task>(
+      `SELECT * FROM tasks
+       WHERE dueDate < $1 AND status NOT IN ($2, $3)
+       ORDER BY dueDate ASC`,
+      [now, "completed", "cancelled"]
+    );
+    return result.rows.map(normalizeTask);
   }
 
   static async updateTask(id: number, data: UpdateTaskRequest): Promise<Task | undefined> {
@@ -123,16 +148,48 @@ export class TaskRepository {
       updateData.completedAt = new Date();
     }
 
-    const [updated] = await knex<Task>("tasks")
-      .where({ id })
-      .update(updateData)
-      .returning("*");
+    const result = await pool.query<Task>(
+      `UPDATE tasks
+       SET
+         title = COALESCE($2, title),
+         description = COALESCE($3, description),
+         status = COALESCE($4, status),
+         priority = COALESCE($5, priority),
+         assignedTo = COALESCE($6, assignedTo),
+         assignedBy = COALESCE($7, assignedBy),
+         residentId = COALESCE($8, residentId),
+         dueDate = COALESCE($9, dueDate),
+         completedAt = COALESCE($10, completedAt),
+         category = COALESCE($11, category),
+         tags = COALESCE($12, tags),
+         fileRefs = COALESCE($13, fileRefs),
+         notes = COALESCE($14, notes)
+       WHERE id = $1
+       RETURNING *`,
+      [
+        id,
+        updateData.title ?? null,
+        updateData.description ?? null,
+        updateData.status ?? null,
+        updateData.priority ?? null,
+        updateData.assignedTo ?? null,
+        updateData.assignedBy ?? null,
+        updateData.residentId ?? null,
+        updateData.dueDate ?? null,
+        updateData.completedAt ?? null,
+        updateData.category ?? null,
+        updateData.tags ?? null,
+        updateData.fileRefs ? JSON.stringify(updateData.fileRefs) : null,
+        updateData.notes ?? null,
+      ]
+    );
     
+    const updated = result.rows[0];
     return updated ? normalizeTask(updated) : undefined;
   }
 
   static async deleteTask(id: number): Promise<void> {
-    await knex<Task>("tasks").where({ id }).delete();
+    await pool.query(`DELETE FROM tasks WHERE id = $1`, [id]);
   }
 
   static async getTaskStats(): Promise<{
@@ -143,20 +200,19 @@ export class TaskRepository {
     cancelled: number;
     overdue: number;
   }> {
-    const [stats] = await knex("tasks")
-      .select(
-        knex.raw('COUNT(*) as total'),
-        knex.raw('COUNT(CASE WHEN status = ? THEN 1 END) as pending', ['pending']),
-        knex.raw('COUNT(CASE WHEN status = ? THEN 1 END) as inProgress', ['in_progress']),
-        knex.raw('COUNT(CASE WHEN status = ? THEN 1 END) as completed', ['completed']),
-        knex.raw('COUNT(CASE WHEN status = ? THEN 1 END) as cancelled', ['cancelled']),
-        knex.raw('COUNT(CASE WHEN due_date < ? AND status NOT IN (?, ?) THEN 1 END) as overdue', [
-          new Date(),
-          'completed',
-          'cancelled'
-        ])
-      );
+    const now = new Date();
+    const result = await pool.query(
+      `SELECT
+         COUNT(*) as total,
+         COUNT(CASE WHEN status = $1 THEN 1 END) as pending,
+         COUNT(CASE WHEN status = $2 THEN 1 END) as inProgress,
+         COUNT(CASE WHEN status = $3 THEN 1 END) as completed,
+         COUNT(CASE WHEN status = $4 THEN 1 END) as cancelled,
+         COUNT(CASE WHEN dueDate < $5 AND status NOT IN ($3, $4) THEN 1 END) as overdue
+       FROM tasks`,
+      ["pending", "in_progress", "completed", "cancelled", now]
+    );
 
-    return stats as any;
+    return result.rows[0] as any;
   }
 }

@@ -103,8 +103,8 @@ Source code is mounted as volumes, so changes are reflected immediately without 
 # Connect to PostgreSQL
 podman exec -it smartapp_postgres psql -U postgres -d toDoList
 
-# Run migrations
-podman exec -it smartapp_backend npm run migrate
+# Create tables (manual schema)
+podman exec -i smartapp_postgres psql -U postgres -d toDoList < schema.sql
 ```
 
 ### Container Shell Access
@@ -133,7 +133,7 @@ podman exec -it smartapp_postgres sh
 - **`postgres_data`** - Persistent PostgreSQL data
 - **`./uploads`** - File uploads directory
 - **`./src`** - Source code (development)
-- **`./knexfile.ts`** - Database configuration
+- **`./schema.sql`** - Database schema
 - **`./package.json`** - Dependencies
 - **`node_modules`** - Node.js modules (macOS only)
 
