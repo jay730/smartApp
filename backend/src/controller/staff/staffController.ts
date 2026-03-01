@@ -4,7 +4,7 @@ import { StaffRepository } from "../../repository/staffRepository";
 //create
 export const createStaffController = async (
   req: Request,
-  res: Response
+  res: Response 
 ): Promise<void> => {
   try {
     const { name, role, assignedResidents } = req.body;

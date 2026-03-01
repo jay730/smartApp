@@ -5,18 +5,22 @@
   "scripts": {
     "start": "ts-node-dev src/index.ts",
     "migrate": "ts-node ./node_modules/knex/bin/cli.js migrate:latest --knexfile knexfile.ts",
-    "rollback": "ts-node ./node_modules/knex/bin/cli.js migrate:rollback --knexfile knexfile.ts"
+    "rollback": "ts-node ./node_modules/knex/bin/cli.js migrate:rollback --knexfile knexfile.ts",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/jest": "^30.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
+    "jest": "^30.2.0",
     "knex": "^3.1.0",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "ts-jest": "^29.4.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
