@@ -1,6 +1,6 @@
-import { StaffMember, StaffRole } from "../types/staff";
+import { Staff, StaffRole } from "../types/staff";
 
-export const staff: StaffMember[] = [
+export const staff: Staff[] = [
   {
     id: 1,
     name: "Dr. Sarah Patel",

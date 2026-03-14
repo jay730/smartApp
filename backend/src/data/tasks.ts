@@ -1,6 +1,6 @@
-import { CareTask, TaskStatus } from "../types/task";
+import { Task, TaskStatus } from "../types/task";
 
-export const tasks: CareTask[] = [
+export const tasks: Task[] = [
   {
     id: 1,
     residentId: 1,

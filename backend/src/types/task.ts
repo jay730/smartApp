@@ -3,7 +3,7 @@ export enum TaskStatus {
   InProgress = "IN_PROGRESS",
   Done = "DONE",
 }
-export interface CareTask {
+export interface Task {
   id: number;
   residentId: number;
   assignedTo: number;

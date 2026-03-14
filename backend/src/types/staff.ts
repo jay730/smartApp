@@ -4,7 +4,7 @@ export enum StaffRole {
   Doctor = "DOCTOR",
   Admin = "ADMIN",
 }
-export interface StaffMember {
+export interface Staff {
   id: number;
   name: string;
   role: StaffRole;
