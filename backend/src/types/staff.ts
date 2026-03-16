@@ -7,7 +7,7 @@ export enum StaffRole {
 export interface Staff {
   id: number;
   name: string;
-  role: StaffRole;
-  email: string;
+  role?: StaffRole;
+  email?: string;
   supervisorId?: number;
 }
