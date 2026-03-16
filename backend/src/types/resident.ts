@@ -8,8 +8,8 @@ export interface Resident {
   id: number;
   name: string;
   age: number;
-  roomNumber: number;
-  status: ResidentStatus;
-  admissionDate: string;
+  roomNumber?: number;
+  status?: ResidentStatus;
+  admissionDate?: string;
   dischargeDate?: string;
 }
