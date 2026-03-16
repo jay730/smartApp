@@ -52,4 +52,5 @@ console.log(residents);
 console.log(getResidentById(1));
 console.log(updateResident(1, { name: "Jane" }));
 console.log(deleteResident(1));
+console.log(residents)
 console.log(deleteResident(99));
