@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Care Components</title>
+  <script type="module" src="dist/components/care-button.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 600px;
+    }
+    .row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    #log {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: #f3f4f6;
+      border-radius: 4px;
+      font-size: 13px;
+      min-height: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h2>care-button</h2>
+  <div class="row">
+    <care-button variant="primary">Save</care-button>
+    <care-button variant="secondary">Cancel</care-button>
+    <care-button variant="danger">Delete</care-button>
+    <care-button disabled>Can't click</care-button>
+  </div>
+  <div id="log">Events will appear here...</div>
+
+  <script type="module">
+    document.querySelectorAll('care-button').forEach((btn) => {
+      btn.addEventListener('care-click', () => {
+        const label = btn.textContent.trim();
+        document.getElementById('log').textContent =
+          `care-click fired from: "${label}" — ${new Date().toLocaleTimeString()}`;
+      });
+    });
+  </script>
+</body>
+</html>
