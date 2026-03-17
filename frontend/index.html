@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Care Components</title>
   <script type="module" src="dist/components/care-button.js"></script>
+  <script type="module" src="dist/components/care-alert.js"></script>
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -38,6 +39,12 @@
     <care-button disabled>Can't click</care-button>
   </div>
   <div id="log">Events will appear here...</div>
+
+  <h2>care-alert</h2>
+  <care-alert variant="info">This resident has an upcoming appointment.</care-alert>
+  <care-alert variant="warning" dismissible>Medication window closes in 15 minutes.</care-alert>
+  <care-alert variant="error" dismissible>Failed to save care note. Please try again.</care-alert>
+  <care-alert variant="success" dismissible>Handoff report submitted successfully.</care-alert>
 
   <script type="module">
     document.querySelectorAll('care-button').forEach((btn) => {

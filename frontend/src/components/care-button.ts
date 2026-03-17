@@ -1,3 +1,5 @@
+export {};
+
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
 const STYLES = `
