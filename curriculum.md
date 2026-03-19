@@ -1,4 +1,4 @@
-## PHASE 1 — Tools & Workflow
+# PHASE 1 — Tools & Workflow
 Session	Depth	Est. Length
 1	Terminal Navigation	Practice-heavy. You navigate the actual CareOS folder structure, create/move/delete real files, and recover from mistakes.	75 min
 2	Git Part 1 — Local	You make real commits with meaningful messages. We inspect the object model — what Git is actually storing.	75 min
@@ -8,10 +8,10 @@ Session	Depth	Est. Length
 6	Balanced Team & Meeting Cadence	Role-play 3 meeting types. You play the engineer role in each.	60 min
 7	Tickets & Product Backlog	You write 5 User Stories, then I critique them and you rewrite. Acceptance tests must be specific and testable.	90 min
 8	Story Points & Estimation	You estimate 10 tasks, explain each number, and we debate the hardest ones.	60 min
-Phase 1 total: ~9 hrs
+### Phase 1 total: ~9 hrs
 
 # PHASE 2 — TypeScript Foundations
-## Session	Depth	Est. Length
+Session	Depth	Est. Length
 9	Primitive Types & Variables	You annotate every variable, explain every const vs let choice. I ask "why" until you can defend it.	60 min
 10	Arrays, Tuples & Enums	You build out the enums you already have + add tuples for room/bed. We discuss when NOT to use an enum.	75 min
 Session 11A — Functions: Mechanics
@@ -37,8 +37,8 @@ Gate: build BaseService<T> with all 3 services cold, explain T, explain class vs
 14	JSON & Parsing	You write facility JSON by hand, parse it in TypeScript with type guards, and explain why JSON.parse returns any.	75 min
 Phase 2 total: ~10 hrs
 
-PHASE 3 — Node.js & Backend Foundation
-#	Session	Depth	Est. Length
+# PHASE 3 — Node.js & Backend Foundation
+Session	Depth	Est. Length
 15	Node.js Architecture	You write blocking vs non-blocking scripts, observe the difference, and explain the event loop in your own words.	75 min
 16	Promises & Async/Await	You write the same function 3 ways: callbacks, .then, async/await. Error handling in all 3.	90 min
 17	Project Setup & Env Files	You scaffold the full CareOS folder structure and explain what each folder is for before writing a single file.	75 min
@@ -47,10 +47,10 @@ PHASE 3 — Node.js & Backend Foundation
 20	Migration 2 — Users Table	You write the FK, explain referential integrity, and intentionally break it to see the DB error.	75 min
 21	SQL — Single Table Queries	You write all 4 CRUD operations in raw SQL, run them in psql, and read the output.	75 min
 22	SQL — JOINs	You write 3 JOIN queries from scratch. I give you the business question; you figure out the SQL.	90 min
-Phase 3 total: ~10 hrs
+### Phase 3 total: ~10 hrs
 
-PHASE 4 — Express.js & Authentication
-#	Session	Depth	Est. Length
+# PHASE 4 — Express.js & Authentication
+Session	Depth	Est. Length
 23	Express Core	You build the app, trace a request through every middleware by hand using console.log, then remove the logs.	90 min
 24	Error Handling	You build AppError, write the error middleware, and test every HTTP status code path deliberately.	90 min
 25	Knex Queries in Code	You write real Knex queries inside a repo file and explain why the repo layer exists separately from the controller.	75 min
@@ -59,10 +59,10 @@ PHASE 4 — Express.js & Authentication
 28	Auth Route — Login	You build the full login endpoint: find user, compare bcrypt hash, sign JWT, return token.	90 min
 29	Authenticate Middleware	You build authenticate.ts, test valid + expired + missing tokens, explain req.user.	75 min
 30	facilityScope Middleware	You build the scope wrapper, then I show you what happens without it — you explain the security hole.	90 min
-Phase 4 total: ~11 hrs
+### Phase 4 total: ~11 hrs
 
-PHASE 5 — CareOS Core Features
-#	Session	Depth	Est. Length
+# PHASE 5 — CareOS Core Features
+Session	Depth	Est. Length
 31	Role-Based Authorization	You build the authorize() factory, test it for every role, and explain 401 vs 403 precisely.	75 min
 32	Residents CRUD — Routes & Controller	You build all 5 endpoints. I test them with curl and you fix anything that doesn't return the right shape.	90 min
 33	Residents Repository	You write the full repo with facilityScope on every query. I verify there's no unscoped query.	75 min
@@ -73,10 +73,10 @@ PHASE 5 — CareOS Core Features
 38	Input Validation	You add JSON schema validation to 3 routes and explain why you validate at the boundary not inside services.	75 min
 39	Invitation System	You build token generation, email invite flow, and token validation from scratch.	90 min
 40	Remaining Migrations	You write all 4 remaining migrations in dependency order and explain why that order is required.	75 min
-Phase 5 total: ~13 hrs
+### Phase 5 total: ~13 hrs
 
-PHASE 6 — Frontend
-#	Session	Depth	Est. Length
+# PHASE 6 — Frontend
+Session	Depth	Est. Length
 41	HTML Foundations	You build a complete resident intake form with all field types. No divs where semantic elements belong.	75 min
 42	CSS Fundamentals	You style the form, explain specificity conflicts, and fix 2 bugs I deliberately introduce.	75 min
 43	Flexbox	You build the task card layout. I give you a screenshot; you match it using only flexbox.	75 min
@@ -88,10 +88,10 @@ PHASE 6 — Frontend
 49	React — useEffect & API Calls	You fetch real CareOS data, handle loading + error states, and explain the dependency array.	90 min
 50	React — useContext	You build AuthContext, wire it to login, and consume it in 2 components.	90 min
 51	Material UI	You replace raw HTML in 3 views with MUI. You explain what theming does and how to override a component.	75 min
-Phase 6 total: ~14 hrs
+### Phase 6 total: ~14 hrs
 
-PHASE 7 — Testing
-#	Session	Depth	Est. Length
+# PHASE 7 — Testing
+Session	Depth	Est. Length
 52	Testing Concepts + Jest Basics	You write 3 tests, explain unit vs integration vs e2e, and set up Jest in CareOS.	75 min
 53	TDD — Test First	You write failing tests first, then implement. I verify you didn't write implementation first and backfill tests.	90 min
 54	Testing TypeScript Functions	You write type-safe tests for 2 real repo functions.	75 min
@@ -99,10 +99,10 @@ PHASE 7 — Testing
 56	Mocking in Tests	You mock the database layer, explain why, and show the test still has value without a real DB.	90 min
 57	Testing Backend Controllers	You write tests for the residents controller using mocked repos. I check for false positives.	90 min
 58	Cypress E2E Testing	You write the login flow test end-to-end. You add an intercept assertion to verify the API was called.	90 min
-Phase 7 total: ~9 hrs
+### Phase 7 total: ~9 hrs
 
-PHASE 8 — Advanced & DevOps
-#	Session	Depth	Est. Length
+# PHASE 8 — Advanced & DevOps
+Session	Depth	Est. Length
 59	Docker & Docker Compose	You write the Dockerfile and compose file. CareOS must boot with one command. You explain each instruction.	90 min
 60	CI/CD Pipeline	You write the full GitLab CI config with lint/test/build stages. You trace what happens on a failed test.	90 min
 61	VSCode Debugger	I give you a real bug in CareOS (wrong data returned). You find it using only breakpoints — no console.log.	75 min
@@ -110,9 +110,9 @@ PHASE 8 — Advanced & DevOps
 63	VIM Basics	You complete vimtutor. Then edit a real CareOS file using only VIM — no mouse.	75 min
 64	Web Workers	You move a background CareOS task (e.g., report generation) into a worker thread.	75 min
 65	Self-Documenting Code	You audit 3 CareOS files, rename unclear variables, and add comments only where the logic can't speak for itself.	75 min
-Phase 8 total: ~9 hrs
+### Phase 8 total: ~9 hrs
 
-Grand Total
+# Grand Total
 Phase	Sessions	No-Limit Est.
 Tools & Workflow	1–8	~9 hrs
 TypeScript	9–14	~10 hrs
