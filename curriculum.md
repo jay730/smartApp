@@ -1,4 +1,4 @@
-##PHASE 1 — Tools & Workflow
+## PHASE 1 — Tools & Workflow
 Session	Depth	Est. Length
 1	Terminal Navigation	Practice-heavy. You navigate the actual CareOS folder structure, create/move/delete real files, and recover from mistakes.	75 min
 2	Git Part 1 — Local	You make real commits with meaningful messages. We inspect the object model — what Git is actually storing.	75 min
@@ -10,8 +10,8 @@ Session	Depth	Est. Length
 8	Story Points & Estimation	You estimate 10 tasks, explain each number, and we debate the hardest ones.	60 min
 Phase 1 total: ~9 hrs
 
-#PHASE 2 — TypeScript Foundations
-##Session	Depth	Est. Length
+# PHASE 2 — TypeScript Foundations
+## Session	Depth	Est. Length
 9	Primitive Types & Variables	You annotate every variable, explain every const vs let choice. I ask "why" until you can defend it.	60 min
 10	Arrays, Tuples & Enums	You build out the enums you already have + add tuples for room/bed. We discuss when NOT to use an enum.	75 min
 Session 11A — Functions: Mechanics
