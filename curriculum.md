@@ -1,13 +1,10 @@
 # PHASE 1 — Tools & Workflow
 Session	Depth	Est. Length
 
-1	Terminal Navigation	Practice-heavy. You navigate the actual CareOS folder structure, create/move/delete real files, and recover from mistakes.	75 min
-
-2	Git Part 1 — Local	You make real commits with meaningful messages. We inspect the object model — what Git is actually storing.	75 min
-
-3	Git Part 2 — Remote & Branching	We simulate a real merge conflict using two branches you both edit. You resolve it manually, no shortcuts.	90 min
-
-4	GitLab & Merge Requests	You open a real MR, trace CI/CD stages, and write an actual MR description as if a senior is reviewing it.	60 min
+1. Terminal Navigation	Practice-heavy. You navigate the actual CareOS folder structure, create/move/delete real files, and recover from mistakes.	75 min
+2. Git Part 1 — Local	You make real commits with meaningful messages. We inspect the object model — what Git is actually storing.	75 min
+3. Git Part 2 — Remote & Branching	We simulate a real merge conflict using two branches you both edit. You resolve it manually, no shortcuts.	90 min
+4. GitLab & Merge Requests	You open a real MR, trace CI/CD stages, and write an actual MR description as if a senior is reviewing it.	60 min
 
 5	Agile vs Waterfall + DevSecOps	Discussion + written comprehension answers. I push back on vague answers until concepts are precise.	60 min
 
