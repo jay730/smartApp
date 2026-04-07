@@ -47,6 +47,8 @@ export function deleteResident(id: number): boolean {
   return false;
 }
 
+
+
 console.log(createResident({ id: 1, name: "John", age: 30 }));
 console.log(residents);
 console.log(getResidentById(1));

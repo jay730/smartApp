@@ -14,16 +14,13 @@ export function getStaffById(id: number): Staff | undefined {
   return undefined;
 }
 
-export function createStaff(
-  newStaff: Staff,
-  role: StaffRole = StaffRole.Caregiver,
-): Staff | string {
+export function createStaff(newStaff: Staff): Staff | string {
   for (const staffMember of staff) {
     if (staffMember.id === newStaff.id) {
       return "Staff with the same ID already exists";
     }
   }
-  newStaff.role = role;
+  newStaff.role = newStaff.role ?? StaffRole.Caregiver;
   staff.push(newStaff);
   return newStaff;
 }
@@ -65,16 +62,18 @@ export function getStaffByRole(
         selectedStaff.push(staffMember);
       }
     }
-  }
-  for (const staffMember of staff) {
-    if (staffMember.role == role) {
-      selectedStaff.push(staffMember);
+    return selectedStaff;
+  } else {
+    for (const staffMember of staff) {
+      if (staffMember.role == role) {
+        selectedStaff.push(staffMember);
+      }
     }
   }
   return selectedStaff;
 }
 
-console.log(1, createStaff({ id: 1, name: "John" }));
+console.log(1, createStaff({ id: 1, name: "John", role: StaffRole.Nurse }));
 console.log(2, staff);
 console.log(3, getStaffById(1));
 console.log(4, updateStaff(1, { name: "Jane" }));
