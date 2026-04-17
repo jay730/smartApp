@@ -237,15 +237,164 @@ interface Staff {
 
 `role` should only ever be `"caregiver"`, `"nurse"`, or `"doctor"`. A plain `string` allows anything. What's the correct TypeScript fix and why is it better?
 
-Jay - 
+Jay -
 
-A.  interface Resident{
-    id: number;
-    name: string;
-    roomNumber: number;
-    dateOfBirth: string;
-    careLevel: number | 1;
-    updatedAt?: string;
+A. interface Resident{
+id: number;
+name: string;
+roomNumber: number;
+dateOfBirth: string;
+careLevel: number | 1;
+updatedAt?: string;
 }
 
-B. 
+B.
+type CreateResidentInput = Resident
+
+C. interface Staff {
+role: "caregiver"| "nurse"| "doctor";
+}
+
+**C — Pass.** String literal union is exactly right. TypeScript errors on anything outside those three values.
+
+**A — Three issues.**
+
+```typescript
+roomNumber: number; // room numbers are strings — "101A", "B-12"
+careLevel: number | 1; // number | 1 is just number. 1 is already a subtype of number, this does nothing
+// defaults belong in the function, not the interface
+```
+
+Also — the spec said use a `BaseEntity` base interface for shared fields. You didn't extend anything. Where is `BaseEntity`?
+
+The correct structure:
+
+```typescript
+interface BaseEntity {
+  id: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+interface Resident extends BaseEntity {
+  name: string;
+  roomNumber: string;
+  dateOfBirth: string;
+  careLevel: number;
+}
+```
+
+**B — Wrong.** `type CreateResidentInput = Resident` gives the caller everything including `id`, `createdAt`, `updatedAt` — which they shouldn't provide. I asked you to chain utility types. Which ones do you need and in what order?
+
+---
+
+Fix A (write the full two interfaces) and fix B (write the correct utility type chain). Paste back.
+
+A. interface Resident{
+id: number;
+name: string;
+roomNumber: string;
+dateOfBirth: string;
+careLevel: number | 1;
+updatedAt?: string;
+}
+
+B.
+type CreateResidentInput = Resident
+
+C. interface Staff {
+role: "caregiver"| "nurse"| "doctor";
+}
+
+**C — Pass.** String literal union is exactly right. TypeScript errors on anything outside those three values.
+
+**A — Three issues.**
+
+```typescript
+roomNumber: number; // room numbers are strings — "101A", "B-12"
+careLevel: number | 1; // number | 1 is just number. 1 is already a subtype of number, this does nothing
+// defaults belong in the function, not the interface
+```
+
+Also — the spec said use a `BaseEntity` base interface for shared fields. You didn't extend anything. Where is `BaseEntity`?
+
+The correct structure:
+
+```typescript
+interface BaseEntity {
+  id: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+interface Resident extends BaseEntity {
+  name: string;
+  roomNumber: string;
+  dateOfBirth: string;
+  careLevel: number;
+}
+```
+
+**B — Wrong.** `type CreateResidentInput = Resident` gives the caller everything including `id`, `createdAt`, `updatedAt` — which they shouldn't provide. I asked you to chain utility types. Which ones do you need and in what order?
+
+---
+
+Fix A (write the full two interfaces) and fix B (write the correct utility type chain). Paste back.
+
+A.
+interface BaseEntity {
+id: number;
+createdAt: string;
+updatedAt?: string;
+}
+
+interface Resident extends BaseEntity {
+name: string;
+roomNumber: string;
+dateOfBirth: string;
+careLevel: number;
+}
+
+C. type CreateResidentInput = Omit<Resident, "id" | "createdAt" | "updatedAt">
+
+You pasted your Apply round answers from earlier — not the Gate round.
+
+The Gate asks for:
+
+**Gate 1 — Three interfaces:**
+
+- `BaseEntity`
+- `Staff` (extends BaseEntity, role as literal union, supervisorId optional)
+- `CreateStaffInput` (utility type — no id/createdAt/updatedAt, role optional)
+
+**Gate 2 — Two written answers:**
+
+- Q1: Why `Omit` before `Partial`, not `Partial` first?
+- Q2: Why does storing `age: number` cause a bug 6 months later, and what's the fix?
+
+Write these from memory, paste back.
+
+gate 1 
+
+interface BaseEntity {
+id: number;
+createdAt: string;
+updatedAt?: string;
+}
+
+interface Staff extends BaseEntity {
+name: string;
+role: "Nurse"| "Doctor" | "Caregiver"
+supervisorId?: number;
+}
+
+type CreateStaffInput = Partial<Omit<Staff, "id" | "createdAt" | "updatedAt">> & {
+  role?: "caregiver" | "nurse" | "doctor";
+};
+
+type CreateStaffInput = Omit<Staff, "id" | "createdAt" | "updatedAt">
+
+gate 2
+
+Q1 omit removes fields before making the rest optional. Partial makes all remaining fields optional
+Q2 We can only store Dob and then calculate age dynamically. 
