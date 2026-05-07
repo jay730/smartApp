@@ -5,9 +5,10 @@ export enum TaskStatus {
 }
 export interface Task {
   id: number;
-  residentId: number;
-  assignedTo: number;
+  name: string;
+  residentId?: number;
+  assignedTo?: number;
   description: string;
-  dueDate: string;
-  status: TaskStatus;
+  dueDate?: string;
+  status?: TaskStatus;
 }

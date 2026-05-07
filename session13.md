@@ -510,5 +510,149 @@ class Staff{
   }
 }
 ```
+Classes — From Scratch
+What is a class?
+A class is a template for creating objects. Think of it like a form:
 
-C.
+class Person {
+  name: string;
+  age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+}
+new Person("Jay", 30) fills out that form and gives you back a real object.
+
+this always means the specific object you just created. Not the class — the instance.
+
+const jay = new Person("Jay", 30);
+const ada = new Person("Ada", 25);
+
+jay.name; // "Jay"
+ada.name; // "Ada"
+Two different objects. Same template.
+
+this — the most important concept
+this inside a class always means "the current object":
+
+class Person {
+  name: string;
+
+  constructor(name: string) {
+    this.name = name; // "store name on THIS object"
+  }
+
+  greet(): string {
+    return `Hi, I am ${this.name}`; // "read name from THIS object"
+  }
+}
+This is why every method uses this. — without it, TypeScript doesn't know you mean the object's field. It thinks you mean a local variable.
+
+The private array problem you kept hitting
+When you write:
+
+class ResidentService {
+  private residents: Resident[] = [];
+}
+residents lives on the object. You can only reach it through this:
+
+// Inside a method:
+this.residents        // correct — reaches the object's array
+residents             // wrong — TypeScript looks for a local variable named residents
+Same rule as this.name above. Always this. when touching class fields.
+
+Access modifiers in plain English
+class Staff {
+  public name: string;      // anyone can read or change this
+  private password: string; // only code inside this class can touch this
+  protected role: string;   // this class AND any class that extends it
+}
+Example:
+
+const staff = new Staff();
+staff.name;     // fine — public
+staff.password; // TypeScript error — private
+Parameter property shorthand — side by side
+These two classes do exactly the same thing:
+
+// Long way
+class Resident {
+  id: number;
+  name: string;
+
+  constructor(id: number, name: string) {
+    this.id = id;
+    this.name = name;
+  }
+}
+
+// Shorthand — TypeScript does the declaring and assigning for you
+class Resident {
+  constructor(
+    public id: number,
+    public name: string
+  ) {}
+}
+Putting public or private in the constructor param tells TypeScript:
+
+Declare this as a field on the class
+Assign the argument to it automatically
+The constructor body is empty because TypeScript handles it.
+
+Detached this — simple example
+class Counter {
+  count: number = 0;
+
+  increment(): void {
+    this.count++;
+  }
+}
+
+const counter = new Counter();
+
+// Works fine — called on the object
+counter.increment();
+
+// Breaks — this is no longer bound to counter
+const fn = counter.increment;
+fn(); // this is undefined — this.count crashes
+Why? Because this in a regular method is determined by who calls it. When you call counter.increment(), counter is the caller, so this = counter. When you store it in fn and call fn(), there's no caller object — this is undefined.
+
+Fix — arrow function property:
+
+class Counter {
+  count: number = 0;
+
+  increment = (): void => {
+    this.count++; // arrow captures this from the class instance — always safe
+  }
+}
+Getters and setters — simple example
+class Patient {
+  private _age: number = 0;
+
+  get age(): number {
+    return this._age;
+  }
+
+  set age(value: number) {
+    if (value < 0) throw new Error("Age cannot be negative");
+    this._age = value;
+  }
+}
+
+const p = new Patient();
+p.age = 25;  // calls the setter
+p.age;       // calls the getter — returns 25
+p.age = -1;  // throws Error
+The underscore _age is convention — it's the private backing field. The getter/setter are the public interface.
+
+Now answer these before we move to generics:
+
+Why does every method inside a class use this. to access fields?
+What is the difference between public, private, and protected?
+What does parameter property shorthand save you from writing?
+Why does storing a method in a variable and calling it break this? What is the fix?
+What is the purpose of a getter and setter? Why not just make the field public?

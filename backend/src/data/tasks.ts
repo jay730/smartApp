@@ -3,6 +3,7 @@ import { Task, TaskStatus } from "../types/task";
 export const tasks: Task[] = [
   {
     id: 1,
+    name: "x",
     residentId: 1,
     assignedTo: 3,
     description: "Assist resident with morning hygiene and dressing",
@@ -11,6 +12,7 @@ export const tasks: Task[] = [
   },
   {
     id: 2,
+    name: "y",
     residentId: 2,
     assignedTo: 2,
     description: "Measure and record resident’s blood pressure and pulse",
@@ -19,6 +21,7 @@ export const tasks: Task[] = [
   },
   {
     id: 3,
+    name: "z",
     residentId: 3,
     assignedTo: 3,
     description: "Assist resident with lunch feeding",
