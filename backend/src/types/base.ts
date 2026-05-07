@@ -1,4 +1,4 @@
-export interface Base {
+export interface BaseEntity {
   id: number;
   name: string;
 }

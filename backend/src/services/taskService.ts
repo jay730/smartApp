@@ -2,14 +2,14 @@ import { tasks as initialTasks } from "../data/tasks";
 import { Task } from "../types/task";
 
 export class TaskService {
-  private task: Task[] = [...initialTasks];
+  private tasks: Task[] = [...initialTasks];
 
   getAllTask = (): Task[] => {
-    return this.task;
+    return this.tasks;
   };
 
   getTaskById = (id: number): Task | undefined => {
-    for (const taskMember of this.task) {
+    for (const taskMember of this.tasks) {
       if (taskMember.id === id) {
         return taskMember;
       }
@@ -18,12 +18,12 @@ export class TaskService {
   };
 
   createTask = (newTask: Task): Task | string => {
-    for (const taskMember of this.task) {
+    for (const taskMember of this.tasks) {
       if (taskMember.id === newTask.id) {
         return "Task with the same ID already exists";
       }
     }
-    this.task.push(newTask);
+    this.tasks.push(newTask);
     return newTask;
   };
 
@@ -31,7 +31,7 @@ export class TaskService {
     id: number,
     updateData: Partial<Omit<Task, "id">>,
   ): Task | undefined => {
-    for (const taskMember of this.task) {
+    for (const taskMember of this.tasks) {
       if (taskMember.id === id) {
         Object.assign(taskMember, updateData);
         return taskMember;
@@ -41,9 +41,9 @@ export class TaskService {
   };
 
   deleteTask = (id: number): boolean => {
-    for (let i = 0; i < this.task.length; i++) {
-      if (this.task[i]?.id === id) {
-        this.task.splice(i, 1);
+    for (let i = 0; i < this.tasks.length; i++) {
+      if (this.tasks[i]?.id === id) {
+        this.tasks.splice(i, 1);
         return true;
       }
     }

@@ -1,5 +1,6 @@
 import { staff as initialStaff } from "../data/staff";
 import { Staff, StaffRole } from "../types/staff";
+import { BaseService } from "./baseService";
 
 export class StaffService {
   private staff: Staff[] = [...initialStaff];
