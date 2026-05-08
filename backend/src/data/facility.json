@@ -1,0 +1,42 @@
+[
+  {
+    "id": 101,
+    "name": "Sunrise Care Facility",
+    "address": "123 Maple Street, San Antonio, TX 78201",
+    "phone": "(210) 555-1234",
+    "capacity": 45,
+    "active": true
+  },
+  {
+    "id": 102,
+    "name": "Golden Oaks Assisted Living",
+    "address": "456 Oak Avenue, Austin, TX 78701",
+    "phone": "(512) 555-5678",
+    "capacity": 60,
+    "active": true
+  },
+  {
+    "id": 103,
+    "name": "Riverbend Senior Care",
+    "address": "789 River Road, Dallas, TX 75201",
+    "phone": "(214) 555-9012",
+    "capacity": 38,
+    "active": false
+  },
+  {
+    "id": 104,
+    "name": "Harmony Hills Care Center",
+    "address": "321 Pine Lane, Houston, TX 77001",
+    "phone": "(713) 555-3456",
+    "capacity": 52,
+    "active": true
+  },
+  {
+    "id": 105,
+    "name": "Lakeside Wellness Home",
+    "address": "654 Lakeview Drive, Fort Worth, TX 76101",
+    "phone": "(817) 555-7890",
+    "capacity": 30,
+    "active": true
+  }
+]
