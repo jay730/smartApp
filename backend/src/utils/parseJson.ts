@@ -14,7 +14,6 @@ export function isFacility(value: unknown): value is Facility {
 export function parseFacility(raw: string): Facility | null {
   try {
     const parsed = JSON.parse(raw);
-    console.log(parsed);
     if (isFacility(parsed)) {
       return parsed;
     }
@@ -25,11 +24,5 @@ export function parseFacility(raw: string): Facility | null {
   }
 }
 
-// console.log(parseFacility({
-//     "id": 101,
-//     "name": "Sunrise Care Facility",
-//     "address": "123 Maple Street, San Antonio, TX 78201",
-//     "phone": "(210) 555-1234",
-//     "capacity": 45,
-//     "active": true
-//   }))
+console.log(parseFacility('{"id": 101,"name": "Sunrise Care Facility","address": "123 Maple Street, San Antonio, TX 78201","phone": "(210) 555-1234","capacity": 45,"active": true}'))
+console.log(parseFacility('{"address": "123 Maple Street, San Antonio, TX 78201","phone": "(210) 555-1234","capacity": 45,"active": true}'))
