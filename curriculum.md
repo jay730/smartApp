@@ -46,8 +46,8 @@
 17. Project Setup & Env Files You scaffold the full CareOS folder structure and explain what each folder is for before writing a single file. 75 min
 18. Knex Setup & DB Config You write knexfile.ts, wire up db.ts, and verify the connection prints success — nothing copy-pasted. 75 min
 19. Migration 1 — Facilities Table You write the migration, explain every column + constraint, run it, and inspect the table in psql. Multi-tenancy design discussion: every subsequent table gets facility_id — you explain why before writing the column. 75 min
-20. Migration 2 — Users Table You write the FK to facilities, explain referential integrity, and intentionally break it to see the DB error. 75 min
-21. SQL — Single Table Queries You write all 4 CRUD operations in raw SQL, run them in psql, and read the output. Add pagination + indexes. 75 min
+20. Migration 2 — Users Table You write the FK, explain referential integrity, and intentionally break it to see the DB error. 75 min
+21. SQL — Single Table Queries You write all 4 CRUD operations in raw SQL, run them in psql, read the output. Add pagination + indexes. 75 min
 22. SQL — JOINs You write 3 JOIN queries from scratch. I give you the business question; you figure out the SQL. 90 min
 
 ### Phase 3 total: ~10 hrs
@@ -70,7 +70,7 @@
 
 # PHASE 5 — CareOS Core Features
 
-34. HIPAA & Texas HB 300 Awareness [NEW] One focused session before writing any PHI. You learn: PHI definition, no-PHI-in-logs/URLs/error-messages, encryption in transit and at rest, minimum-necessary access principle. HB 300 applies more broadly than federal HIPAA and covers Texas RAL/ALFs specifically. You audit your existing code for violations before building further. 75 min
+34. HIPAA & Texas HB 300 Awareness [NEW] One focused session before writing any PHI. PHI definition, no-PHI-in-logs/URLs/error-messages, encryption in transit and at rest, minimum-necessary access. HB 300 applies more broadly than federal HIPAA and covers Texas RAL/ALFs specifically. You audit your existing code for violations before building further. 75 min
 35. Role-Based Authorization You build the authorize() factory, test it for every role, and explain 401 vs 403 precisely. 75 min
 36. Input Validation [MOVED BEFORE CRUD] You add JSON schema validation to 3 routes and explain why you validate at the boundary not inside services. Done before CRUD so every endpoint is validated from day one. 75 min
 37. Residents CRUD — Routes & Controller You build all 5 endpoints including soft delete (deleted_at timestamp — no hard deletes on healthcare records). I test them with curl and you fix anything that doesn't return the right shape. 90 min
@@ -83,6 +83,7 @@
 44. Incident Reporting — HHSC/TAC Title 26 Ch. 553 [NEW] You build the incident reporting workflow: required fields per HHSC, status workflow (open → submitted → closed), reporting deadline enforcement. You explain what TAC Title 26 Ch. 553 requires and how your code enforces it. 90 min
 45. Service Plans [NEW] You build service plan records with 12-month review dates. You write a scheduled job (cron) that flags overdue plans. You explain why Web Workers are the wrong tool for this and why cron is correct. 75 min
 46. Invitation System You build token generation, email invite flow, and token validation from scratch. 90 min
+
 NOTE: Migrations are written per-feature as each one is built. There is no batch migration session.
 
 ### Phase 5 total: ~16 hrs
@@ -93,7 +94,7 @@ NOTE: Migrations are written per-feature as each one is built. There is no batch
 48. CSS Fundamentals You style the form, explain specificity conflicts, and fix 2 bugs I deliberately introduce. 75 min
 49. Flexbox You build the task card layout. I give you a screenshot; you match it using only flexbox. 75 min
 50. CSS Grid & Responsive Design You build the shift dashboard. Must work at 3 breakpoints. 90 min
-51. JavaScript Core You do 10 exercises using only the new syntax. No loops where destructuring/spread applies. 75 min
+51. JavaScript Core You do 10 exercises using only the new syntax. No loops where destructuring/spread applies. 90 min
 52. Native JS — Map, Filter, Reduce You rewrite 3 loops. Then I give you a new problem and you pick the right method and explain why. 75 min
 53. React Intro — Components & Props You build ResidentCard. I change the props interface; you update the component to match. 75 min
 54. React — useState You build the task toggle. You explain what triggers a re-render and what doesn't. 75 min
@@ -130,22 +131,22 @@ NOTE: Jest basics + TDD moved to Session 28 (after Controllers layer). All Phase
 
 # Grand Total
 
-Phase                 Sessions   Est.
-Tools & Workflow      1–8        ~9 hrs
-TypeScript            9–14       ~10 hrs
-Node + DB             15–22      ~10 hrs
-Express + Auth        23–33      ~14 hrs
-CareOS Features       34–46      ~16 hrs
-Frontend              47–58      ~15 hrs
-Testing               59–64      ~9 hrs
-Advanced              65–70      ~8 hrs
-Total                 70         ~91 hrs
+Phase Sessions No-Limit Est.
+Tools & Workflow 1–8 ~9 hrs
+TypeScript 9–14 ~10 hrs
+Node + DB 15–22 ~10 hrs
+Express + Auth 23–33 ~14 hrs
+CareOS Features 34–46 ~16 hrs
+Frontend 47–58 ~15 hrs
+Testing 59–64 ~9 hrs
+Advanced 65–70 ~8 hrs
+Total 70 ~91 hrs
 
-Changes from original curriculum:
+Changes from original:
 - Session 26 (NEW): Database Transactions — critical for MAR writes and audit atomicity
-- Session 28 (MOVED): Jest + TDD moved from Phase 7 to after Controllers — tests required from this point
+- Session 28 (MOVED): Jest + TDD moved from Phase 7 to after Controllers — tests required from this point forward
 - Session 33 (NEW): Security Hardening — rate limiting, helmet, CORS, password reset
-- Session 34 (NEW): HIPAA/Texas HB 300 — PHI rules, HB 300 compliance, code audit
+- Session 34 (NEW): HIPAA/Texas HB 300 — PHI rules, HB 300 compliance, code audit before building features
 - Session 36 (MOVED): Input Validation moved before CRUD sessions
 - Session 37 (MODIFIED): Residents CRUD now includes soft deletes — no hard deletes on healthcare records
 - Session 43 (NEW): MAR — immutable med records, missed dose, controlled substance counts
@@ -154,11 +155,8 @@ Changes from original curriculum:
 - Session 57 (NEW): React Router + Protected Routes
 - Session 61 (NEW): Integration Testing with real Postgres test database
 - Session 40 (REMOVED): Batch migrations session removed — each migration written per feature
-- Session 64 (MODIFIED): Web Workers replaced with cron/background jobs (correct tool for report generation)
 - Session 19 (MODIFIED): Multi-tenancy design discussion added at facility_id introduction
 - Session 21 (MODIFIED): Pagination + indexes added to SQL queries session
-
----
 
 Level 1 — Current Standard
 "You can defend what you built before we move on."
