@@ -6,9 +6,14 @@ export enum ResidentStatus {
 }
 
 export interface Resident extends BaseEntity {
-  age: number;
-  roomNumber?: number;
-  status?: ResidentStatus;
-  admissionDate?: string;
-  dischargeDate?: string;
+  facility_id: number;
+  first_name: string;
+  last_name: string;
+  date_of_birth?: string;
+  move_in_date?: string;
+  move_out_date?: string;
+  room_number?: string;
+  status: ResidentStatus;
+  active: boolean;
 }
+
