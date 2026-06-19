@@ -23,10 +23,4 @@ export class FacilityService extends BaseService<Facility> {
 }
 
 const service = new FacilityService();
-console.log(service.create({ id: 1, name: "Moonrise" }));
-console.log(service.getAll());
-console.log(service.getById(1));
-console.log(service.updateFacility(1, { name: "Milkyway" }));
-console.log(service.delete(1));
-console.log(service.getAll());
-console.log(service.delete(99));
+

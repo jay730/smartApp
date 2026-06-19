@@ -1,4 +1,4 @@
-import { tasks } from "./tasks";
+import { tasks } from "../data/tasks";
 import { TaskStatus } from "../types/task";
 
 describe("tasks", () => {
